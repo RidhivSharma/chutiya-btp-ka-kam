@@ -1,1 +1,5 @@
+# Extracted CSV folder
+CSV_Files/
+
+# Large archive (115 MB, over GitHub's 100 MB limit)
 CSV_Files.zip
