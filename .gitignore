@@ -1,5 +1,12 @@
 # Extracted CSV folder
 CSV_Files/
+data/raw/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
 
 # Large archive (115 MB, over GitHub's 100 MB limit)
 CSV_Files.zip
