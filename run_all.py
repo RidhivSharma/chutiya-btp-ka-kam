@@ -16,6 +16,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 # Append new phases here as the project grows.
 STEPS = [
     ("Phase 1 - data extraction and integrity check", PROJECT_ROOT / "src" / "phase1_data_check.py"),
+    ("Phase 2 - preprocessing and healthy split", PROJECT_ROOT / "src" / "data.py"),
+    ("Phase 2 - preprocessing sanity checks", PROJECT_ROOT / "src" / "sanity_checks.py"),
 ]
 
 

@@ -1,0 +1,198 @@
+{
+  "phase": "phase_2_sanity_checks",
+  "generated_utc": "2026-10-26T08:30:25.154972+00:00",
+  "git_commit": "bc179b149af62ea225333f1d300db5692d68fe7c",
+  "environment": {
+    "python": "3.13.1",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "numpy": "2.2.3",
+    "pandas": "2.2.3",
+    "scipy": "1.15.2",
+    "scikit-learn": "1.6.1"
+  },
+  "all_passed": true,
+  "checks_passed": 30,
+  "checks_total": 30,
+  "checks": [
+    {
+      "name": "all 16 files present",
+      "passed": true,
+      "detail": "16 window sets, 16 time sets, 16 decimated row sets"
+    },
+    {
+      "name": "13 features in documented order",
+      "passed": true,
+      "detail": "Ipv, Vpv, Vdc, ia, ib, ic, va, vb, vc, Iabc, If, Vabc, Vf"
+    },
+    {
+      "name": "window shapes are (n, 100, 13) float32 with (n, 2) times",
+      "passed": true,
+      "detail": "all files conform"
+    },
+    {
+      "name": "no NaN values",
+      "passed": true,
+      "detail": "0 NaN values in windows/times/decimated rows"
+    },
+    {
+      "name": "no infinite values",
+      "passed": true,
+      "detail": "0 infinite values in windows/times/decimated rows"
+    },
+    {
+      "name": "window counts follow 1 + (n - 100) // 10",
+      "passed": true,
+      "detail": "21,488 windows over 16 files"
+    },
+    {
+      "name": "decimated sampling rate is 1 kHz",
+      "passed": true,
+      "detail": "measured range 1000.03-1000.91 Hz"
+    },
+    {
+      "name": "window start times equal Time[::10] at each window start",
+      "passed": true,
+      "detail": "all starts aligned with the decimated Time column"
+    },
+    {
+      "name": "window end times equal the Time value of sample start+99",
+      "passed": true,
+      "detail": "all end timestamps taken from the Time column"
+    },
+    {
+      "name": "window start times strictly increase",
+      "passed": true,
+      "detail": "every file is in chronological order"
+    },
+    {
+      "name": "median window span is 99 ms",
+      "passed": true,
+      "detail": "median 0.098990 s, expected 0.099 s"
+    },
+    {
+      "name": "IPPT scaler parameters equal healthy-train statistics",
+      "passed": true,
+      "detail": "fitted on 8,650 raw rows [0, 8650), 13 features"
+    },
+    {
+      "name": "IPPT scaler never saw validation/test rows",
+      "passed": true,
+      "detail": "fit rows are exactly the train-window rows; 0 shared raw rows with val/test"
+    },
+    {
+      "name": "MPPT scaler parameters equal healthy-train statistics",
+      "passed": true,
+      "detail": "fitted on 8,490 raw rows [0, 8490), 13 features"
+    },
+    {
+      "name": "MPPT scaler never saw validation/test rows",
+      "passed": true,
+      "detail": "fit rows are exactly the train-window rows; 0 shared raw rows with val/test"
+    },
+    {
+      "name": "windows are standardized with their mode's scaler",
+      "passed": true,
+      "detail": "checked first/middle/last window of all 16 files; max abs difference 0"
+    },
+    {
+      "name": "IPPT split sizes follow 60/20/20 minus two 10-window gaps",
+      "passed": true,
+      "detail": "train=856, val=285, test=267, gap=2x10, total windows=1,428"
+    },
+    {
+      "name": "IPPT train/val/test window indices are disjoint",
+      "passed": true,
+      "detail": "{'train/val': 0, 'train/test': 0, 'val/test': 0}"
+    },
+    {
+      "name": "IPPT has a 10-window gap between consecutive parts",
+      "passed": true,
+      "detail": "val starts 10 windows after train, test starts 10 windows after val"
+    },
+    {
+      "name": "IPPT gap windows belong to no split",
+      "passed": true,
+      "detail": "20 gap windows excluded"
+    },
+    {
+      "name": "IPPT train/val/test share no raw samples",
+      "passed": true,
+      "detail": "{'train/val': 0, 'train/test': 0, 'val/test': 0}"
+    },
+    {
+      "name": "IPPT splits are chronological",
+      "passed": true,
+      "detail": "train ends 8.648 s, val starts 8.659 s, test starts 11.609 s"
+    },
+    {
+      "name": "IPPT split covers every healthy window exactly once",
+      "passed": true,
+      "detail": "train+val+test+gap = 1,428 of 1,428 windows"
+    },
+    {
+      "name": "MPPT split sizes follow 60/20/20 minus two 10-window gaps",
+      "passed": true,
+      "detail": "train=840, val=280, test=261, gap=2x10, total windows=1,401"
+    },
+    {
+      "name": "MPPT train/val/test window indices are disjoint",
+      "passed": true,
+      "detail": "{'train/val': 0, 'train/test': 0, 'val/test': 0}"
+    },
+    {
+      "name": "MPPT has a 10-window gap between consecutive parts",
+      "passed": true,
+      "detail": "val starts 10 windows after train, test starts 10 windows after val"
+    },
+    {
+      "name": "MPPT gap windows belong to no split",
+      "passed": true,
+      "detail": "20 gap windows excluded"
+    },
+    {
+      "name": "MPPT train/val/test share no raw samples",
+      "passed": true,
+      "detail": "{'train/val': 0, 'train/test': 0, 'val/test': 0}"
+    },
+    {
+      "name": "MPPT splits are chronological",
+      "passed": true,
+      "detail": "train ends 8.488 s, val starts 8.499 s, test starts 11.399 s"
+    },
+    {
+      "name": "MPPT split covers every healthy window exactly once",
+      "passed": true,
+      "detail": "train+val+test+gap = 1,401 of 1,401 windows"
+    }
+  ],
+  "totals": {
+    "files": 16,
+    "windows_all_files": 21488,
+    "healthy_windows": {
+      "IPPT": 1428,
+      "MPPT": 1401
+    },
+    "nan_values": 0,
+    "infinite_values": 0,
+    "decimated_hz_min": 1000.0313782985907,
+    "decimated_hz_max": 1000.9119459881256
+  },
+  "scaler_fit": {
+    "IPPT": {
+      "fit_row_start": 0,
+      "fit_row_stop_exclusive": 8650,
+      "fit_rows": 8650,
+      "n_samples_seen": 8650,
+      "max_abs_mean_diff_vs_whole_file": 0.2046718625873325,
+      "max_abs_scale_diff_vs_whole_file": 1.655319945584238
+    },
+    "MPPT": {
+      "fit_row_start": 0,
+      "fit_row_stop_exclusive": 8490,
+      "fit_rows": 8490,
+      "n_samples_seen": 8490,
+      "max_abs_mean_diff_vs_whole_file": 0.3031172847052517,
+      "max_abs_scale_diff_vs_whole_file": 1.7708990346011806
+    }
+  }
+}

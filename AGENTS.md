@@ -124,3 +124,26 @@ At the end of every phase:
 - `models/` - trained model artifacts and checkpoints.
 - `data/raw/` - extracted raw CSVs; never edit raw data.
 - `STATUS.md` - chronological phase log.
+
+## 11. Phase summary report (`results/summary.md`)
+
+- After finishing **every** phase, update `results/summary.md`. Never overwrite
+  earlier sections; append a new section for the phase. Each section must use
+  this format:
+
+    ```
+    ## Phase N: <title>   (date and time)
+    What was done: 3 to 6 plain-language sentences for a non-ML reader.
+    Files created or changed: list with one-line purpose each.
+    Key numbers: a simple markdown table with the important values, all read from saved csv/json files or printed by code (never typed from memory).
+    Checks passed: bullet list (e.g. no NaN, scaler fitted on train only, no overlap between splits).
+    Problems or warnings: anything unexpected, or "none".
+    Decision needed from me: yes/no, and what.
+    Next phase: one line.
+    ```
+
+- Also append the same short entry to `STATUS.md`.
+- The summary must be created even if the phase had problems. If something
+  failed, say exactly what failed.
+- In later phases, if a prompt tells you to write `results/summary.md`, add a
+  new section to the existing file instead of replacing it.

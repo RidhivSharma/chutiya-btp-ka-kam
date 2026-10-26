@@ -1,0 +1,371 @@
+{
+  "phase": "phase_2_preprocessing",
+  "generated_utc": "2026-10-26T08:21:06.540832+00:00",
+  "git_commit": "bc179b149af62ea225333f1d300db5692d68fe7c",
+  "environment": {
+    "python": "3.13.1",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "numpy": "2.2.3",
+    "pandas": "2.2.3",
+    "scipy": "1.15.2",
+    "scikit-learn": "1.6.1"
+  },
+  "features": [
+    "Ipv",
+    "Vpv",
+    "Vdc",
+    "ia",
+    "ib",
+    "ic",
+    "va",
+    "vb",
+    "vc",
+    "Iabc",
+    "If",
+    "Vabc",
+    "Vf"
+  ],
+  "config": {
+    "dataset": "GPVS-Faults",
+    "stochastic": false,
+    "seed": null,
+    "seed_note": "No random operation is performed in this module.",
+    "native_sampling_hz": 10000,
+    "target_sampling_hz": 1000,
+    "downsample_factor": 10,
+    "decimation": {
+      "function": "scipy.signal.decimate",
+      "q": 10,
+      "ftype": "iir",
+      "filter": "order-8 Chebyshev type I, 0.05 dB ripple",
+      "cutoff_hz": 400.0,
+      "zero_phase": true,
+      "axis": 0,
+      "time_alignment": "Time[::10]",
+      "note": "filtfilt gives zero net phase shift, so decimated sample i corresponds to native sample i*10. Edge transients are kept.",
+      "replaces_notebook_choice": "df.iloc[::10] without anti-aliasing"
+    },
+    "windowing": {
+      "window_size": 100,
+      "stride": 10,
+      "overlap_samples": 90,
+      "overlap_fraction": 0.9,
+      "values": "standardized with the mode's healthy-training scaler",
+      "end_time": "timestamp of the last sample in the window",
+      "windows_per_file": "1 + (n_decimated - window_size) // stride"
+    },
+    "healthy_split": {
+      "basis": "chronological order of F0L/F0M windows",
+      "fractions": {
+        "train": 0.6,
+        "val": 0.2,
+        "test": 0.2
+      },
+      "gap_windows": 10,
+      "note": "Ten windows are dropped between train/val and between val/test, so the parts share no raw samples. Gap windows are not part of any split and test is slightly below 20%."
+    },
+    "scaling": {
+      "class": "sklearn.preprocessing.StandardScaler",
+      "scope": "one scaler per operating mode",
+      "fit_data": "unique raw decimated rows covered by the healthy training windows of that mode (F0L for IPPT, F0M for MPPT)",
+      "applied_to": "all 16 files of the corresponding mode",
+      "ddof": 0
+    }
+  },
+  "counts": [
+    {
+      "file": "F0L",
+      "mode": "IPPT",
+      "condition": "healthy",
+      "native_rows": 143715,
+      "decimated_rows": 14372,
+      "windows": 1428,
+      "measured_fs_hz": 1000.0313782985907,
+      "decimated_start_s": 2.81780014539379e-05,
+      "decimated_end_s": 14.3695749400239
+    },
+    {
+      "file": "F0M",
+      "mode": "MPPT",
+      "condition": "healthy",
+      "native_rows": 141014,
+      "decimated_rows": 14102,
+      "windows": 1401,
+      "measured_fs_hz": 1000.0313783005337,
+      "decimated_start_s": 4.08491581058712e-05,
+      "decimated_end_s": 14.0996286333537
+    },
+    {
+      "file": "F1L",
+      "mode": "IPPT",
+      "condition": "fault",
+      "native_rows": 129013,
+      "decimated_rows": 12902,
+      "windows": 1281,
+      "measured_fs_hz": 1000.0313783036424,
+      "decimated_start_s": 5.93236517207885e-05,
+      "decimated_end_s": 12.8997803587981
+    },
+    {
+      "file": "F1M",
+      "mode": "MPPT",
+      "condition": "fault",
+      "native_rows": 139014,
+      "decimated_rows": 13902,
+      "windows": 1381,
+      "measured_fs_hz": 1000.0313783005337,
+      "decimated_start_s": 3.79166988011548e-05,
+      "decimated_end_s": 13.8996346155707
+    },
+    {
+      "file": "F2L",
+      "mode": "IPPT",
+      "condition": "fault",
+      "native_rows": 142128,
+      "decimated_rows": 14213,
+      "windows": 1412,
+      "measured_fs_hz": 1000.9119459881256,
+      "decimated_start_s": 2.5307123793894e-05,
+      "decimated_end_s": 14.1992249216813
+    },
+    {
+      "file": "F2M",
+      "mode": "MPPT",
+      "condition": "fault",
+      "native_rows": 144015,
+      "decimated_rows": 14402,
+      "windows": 1431,
+      "measured_fs_hz": 1000.0313782996454,
+      "decimated_start_s": 3.96761743850504e-05,
+      "decimated_end_s": 14.3995992794361
+    },
+    {
+      "file": "F3L",
+      "mode": "IPPT",
+      "condition": "fault",
+      "native_rows": 103497,
+      "decimated_rows": 10350,
+      "windows": 1026,
+      "measured_fs_hz": 1000.0313783045307,
+      "decimated_start_s": 3.76234528722819e-05,
+      "decimated_end_s": 10.3480108688672
+    },
+    {
+      "file": "F3M",
+      "mode": "MPPT",
+      "condition": "fault",
+      "native_rows": 69967,
+      "decimated_rows": 6997,
+      "windows": 690,
+      "measured_fs_hz": 1000.0313783045307,
+      "decimated_start_s": 8.307657208384e-05,
+      "decimated_end_s": 6.99538058483209
+    },
+    {
+      "file": "F4L",
+      "mode": "IPPT",
+      "condition": "fault",
+      "native_rows": 144014,
+      "decimated_rows": 14402,
+      "windows": 1431,
+      "measured_fs_hz": 1000.0313783001659,
+      "decimated_start_s": 5.46317168357291e-05,
+      "decimated_end_s": 14.3996488379983
+    },
+    {
+      "file": "F4M",
+      "mode": "MPPT",
+      "condition": "fault",
+      "native_rows": 144014,
+      "decimated_rows": 14402,
+      "windows": 1431,
+      "measured_fs_hz": 1000.03137829959,
+      "decimated_start_s": 9.80321145345187e-05,
+      "decimated_end_s": 14.3996640867867
+    },
+    {
+      "file": "F5L",
+      "mode": "IPPT",
+      "condition": "fault",
+      "native_rows": 143015,
+      "decimated_rows": 14302,
+      "windows": 1421,
+      "measured_fs_hz": 1000.0313783005337,
+      "decimated_start_s": 1.94422051862375e-05,
+      "decimated_end_s": 14.2995557910646
+    },
+    {
+      "file": "F5M",
+      "mode": "MPPT",
+      "condition": "fault",
+      "native_rows": 144014,
+      "decimated_rows": 14402,
+      "windows": 1431,
+      "measured_fs_hz": 1000.03137829959,
+      "decimated_start_s": 5.25789953229605e-05,
+      "decimated_end_s": 14.3996159944541
+    },
+    {
+      "file": "F6L",
+      "mode": "IPPT",
+      "condition": "fault",
+      "native_rows": 144015,
+      "decimated_rows": 14402,
+      "windows": 1431,
+      "measured_fs_hz": 1000.0343108572906,
+      "decimated_start_s": 3.90015943807498e-06,
+      "decimated_end_s": 14.3995415113323
+    },
+    {
+      "file": "F6M",
+      "mode": "MPPT",
+      "condition": "fault",
+      "native_rows": 144015,
+      "decimated_rows": 14402,
+      "windows": 1431,
+      "measured_fs_hz": 1000.0343108572906,
+      "decimated_start_s": 4.67139397279936e-05,
+      "decimated_end_s": 14.3995640912027
+    },
+    {
+      "file": "F7L",
+      "mode": "IPPT",
+      "condition": "fault",
+      "native_rows": 144015,
+      "decimated_rows": 14402,
+      "windows": 1431,
+      "measured_fs_hz": 1000.0343108572906,
+      "decimated_start_s": 9.74453369195771e-05,
+      "decimated_end_s": 14.3995878440534
+    },
+    {
+      "file": "F7M",
+      "mode": "MPPT",
+      "condition": "fault",
+      "native_rows": 144015,
+      "decimated_rows": 14402,
+      "windows": 1431,
+      "measured_fs_hz": 1000.0343108572906,
+      "decimated_start_s": 8.5715534101638e-05,
+      "decimated_end_s": 14.3995312477548
+    }
+  ],
+  "split_counts": {
+    "IPPT": {
+      "train": {
+        "count": 856,
+        "fraction_of_healthy_windows": 0.5994397759103641,
+        "first_window": 0,
+        "last_window": 855
+      },
+      "val": {
+        "count": 285,
+        "fraction_of_healthy_windows": 0.19957983193277312,
+        "first_window": 866,
+        "last_window": 1150
+      },
+      "test": {
+        "count": 267,
+        "fraction_of_healthy_windows": 0.1869747899159664,
+        "first_window": 1161,
+        "last_window": 1427
+      }
+    },
+    "MPPT": {
+      "train": {
+        "count": 840,
+        "fraction_of_healthy_windows": 0.5995717344753747,
+        "first_window": 0,
+        "last_window": 839
+      },
+      "val": {
+        "count": 280,
+        "fraction_of_healthy_windows": 0.1998572448251249,
+        "first_window": 850,
+        "last_window": 1129
+      },
+      "test": {
+        "count": 261,
+        "fraction_of_healthy_windows": 0.18629550321199143,
+        "first_window": 1140,
+        "last_window": 1400
+      }
+    }
+  },
+  "scalers": {
+    "IPPT": {
+      "fit_row_start": 0,
+      "fit_row_stop_exclusive": 8650,
+      "fit_rows": 8650,
+      "n_samples_seen": 8650,
+      "n_features_in": 13,
+      "mean": [
+        1.4867025302420733,
+        100.03265064947827,
+        141.48703661822586,
+        -0.013484828134300629,
+        0.0028596745030940248,
+        -0.017279699154360492,
+        0.7841314046893055,
+        0.6122685942478466,
+        0.6175041719871919,
+        0.48184531854805807,
+        49.4317000392531,
+        152.9801087499856,
+        49.42811895774753
+      ],
+      "scale": [
+        0.04720941449524779,
+        0.08977159408966721,
+        0.46801425236203814,
+        0.34745525109241704,
+        0.34916432667031516,
+        0.3344890690046897,
+        109.33827636587573,
+        109.33114961552349,
+        109.31887843408218,
+        0.03380212595696049,
+        0.19329402833934575,
+        7.408346251001755,
+        0.013392674327878353
+      ]
+    },
+    "MPPT": {
+      "fit_row_start": 0,
+      "fit_row_stop_exclusive": 8490,
+      "fit_rows": 8490,
+      "n_samples_seen": 8490,
+      "n_features_in": 13,
+      "mean": [
+        2.2484637869088258,
+        89.44740835984565,
+        145.90482525657058,
+        -0.003186312294336586,
+        -0.004195169696458917,
+        -0.052156704197847674,
+        0.5618027548403927,
+        0.5859674552199484,
+        0.7453472274645178,
+        0.6920121680556501,
+        49.447146105689725,
+        152.9060897632089,
+        49.4249568158878
+      ],
+      "scale": [
+        0.040509677456520905,
+        0.08929539782074275,
+        0.6723519147692104,
+        0.495189676194486,
+        0.5080350825587757,
+        0.4793768831718327,
+        109.39088006836796,
+        109.3886705337743,
+        109.38534933257219,
+        0.02984693117208195,
+        0.1692809456997526,
+        7.93878984266762,
+        0.033864049273842185
+      ]
+    }
+  }
+}
