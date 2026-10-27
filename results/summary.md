@@ -288,3 +288,111 @@ Problems or warnings:
 Decision needed from me: No. The label convention is fixed in `AGENTS.md` (whole-file primary, time-resolved secondary, `F3M` always reported as having no post-injection data), so Phase 4 can proceed. The 95% and 2.0x/1.2x cut-offs used above are descriptive reporting conventions only, not detector settings.
 
 Next phase: Phase 4 - train the proposed healthy-only autoencoder on the same frozen windows and save its scores in the same five-key npz format.
+
+## Phase 4: Proposed healthy-only TCN-BiLSTM autoencoder   (2026-10-27 17:42)
+
+What was done: The proposed TCN-BiLSTM autoencoder was copied unchanged from `Untitled0.ipynb` and trained separately for MPPT and IPPT with seeds 0, 1 and 2. Each run used only the healthy training windows of its mode for fitting and the healthy validation windows for early stopping; no fault file influenced training, normalization, threshold selection, or any model decision. Two scores were saved for every window of every file: the plain mean squared reconstruction error and a fixed k=3 feature-normalized score whose per-feature mean and standard deviation come only from healthy validation windows. The threshold of each score is the 99th percentile of that score on healthy validation windows; the fixed k=3 was set before any fault scoring and was not tuned. The training script is resumable through the saved model file and writes one progress line per epoch to `logs/train.log`. Only sanity outputs were produced; no final classification metrics were computed.
+
+Files created or changed:
+- `src/model.py` - the notebook's `tcn_residual_block` and `build_tcn_bilstm_autoencoder` copied without architecture changes.
+- `src/train.py` - resumable healthy-only training, two-score scoring, archive saving, sanity/training tables, and checks.
+- `src/phase4_summary.py` - reads saved results and writes this section plus the STATUS entry.
+- `run_all.py` - added the Phase 4 training and summary steps.
+- `models/proposed_tcn_bilstm_<mode>_seed<k>.keras` - 6 trained models.
+- `results/history_<mode>_seed<k>.json` and `figures/training_curve_<mode>_seed<k>.png` - one history and training curve per run.
+- `results/scores_proposed_<score>_<mode>_seed<k>.npz` - 12 archives with the five baseline keys plus `feature_errors` of shape `(n_windows, 13)`.
+- `results/proposed_sanity.csv` - healthy validation/test flag rates, per-fault whole-file shares, and pre/post-8 s medians for both scores and all seeds.
+- `results/proposed_training.csv` - epochs run, best epoch, and best/final validation loss per mode and seed.
+- `results/proposed_run_<mode>_seed<k>.json` - per-run configuration, thresholds, normalization statistics, timing, and check results.
+- `results/proposed_metadata.json` - configuration, thresholds, normalization statistics, check results, environment, git commit.
+- `results/phase4_summary_stats.json` - the facts used in this report.
+- `results/summary.md` - this Phase 4 section.
+- `STATUS.md` - appended Phase 4 log entry.
+- `logs/train.log` - per-epoch progress and resumability log.
+
+Key numbers:
+
+### Training runs
+
+| Mode | Seed | Epochs run | Best epoch | Best val loss | Final val loss | Stopped early | Training time (min) |
+|---|---|---|---|---|---|---|---|
+| MPPT | 0 | 100 | 100 | 0.131720 | 0.131720 | no | 11.0 |
+| MPPT | 1 | 92 | 80 | 0.126161 | 0.126189 | yes | 8.9 |
+| MPPT | 2 | 100 | 100 | 0.122294 | 0.122294 | no | 10.8 |
+| IPPT | 0 | 100 | 100 | 0.128270 | 0.128270 | no | 18.5 |
+| IPPT | 1 | 100 | 100 | 0.130297 | 0.130297 | no | 19.7 |
+| IPPT | 2 | 100 | 100 | 0.140197 | 0.140197 | no | 22.6 |
+
+Training time is the measured `fit` call only. The best epoch is the `argmin` of the saved validation-loss history; the model file contains the restored best weights.
+
+### Healthy false alarms
+
+| Score | Mode | Validation FAR mean (range) | Test FAR mean (range) | Test false alarms by seed |
+|---|---|---|---|---|
+| plain | MPPT | 1.07% (1.07%-1.07%) | 2.17% (1.92%-2.30%) | s0: 5/261; s1: 6/261; s2: 6/261 |
+| plain | IPPT | 1.05% (1.05%-1.05%) | 0.00% (0.00%-0.00%) | s0: 0/267; s1: 0/267; s2: 0/267 |
+| featnorm | MPPT | 1.07% (1.07%-1.07%) | 28.74% (16.86%-41.38%) | s0: 108/261; s1: 73/261; s2: 44/261 |
+| featnorm | IPPT | 1.05% (1.05%-1.05%) | 11.24% (8.61%-15.36%) | s0: 26/267; s1: 23/267; s2: 41/267 |
+
+A false alarm is a healthy window with score > threshold. Validation windows set the threshold; test windows are later in time and were never used for fitting or thresholding.
+
+### F4, F6 and F7: post-8 s rise versus baselines
+
+| Score | Fault file | Mode | Post/pre ratio seed 0 / 1 / 2 | Mean (range) | Rise class across seeds | Baselines with clear rise |
+|---|---|---|---|---|---|---|
+| plain | F4L | IPPT | 1.00x / 1.00x / 1.00x | 1.00x (1.00x-1.00x) | flat 3/3 | 0/5 |
+| plain | F4M | MPPT | 1.01x / 1.01x / 1.01x | 1.01x (1.01x-1.01x) | flat 3/3 | 0/5 |
+| plain | F6L | IPPT | 1.43x / 1.42x / 1.38x | 1.41x (1.38x-1.43x) | weak 3/3 | 0/5 |
+| plain | F6M | MPPT | 1.00x / 1.00x / 1.00x | 1.00x (1.00x-1.00x) | flat 3/3 | 0/5 |
+| plain | F7L | IPPT | 1.04x / 1.03x / 0.96x | 1.01x (0.96x-1.04x) | flat 3/3 | 1/5 (LocalOutlierFactor) |
+| plain | F7M | MPPT | 1.01x / 1.00x / 1.00x | 1.00x (1.00x-1.01x) | flat 3/3 | 0/5 |
+| featnorm | F4L | IPPT | 1.00x / 1.00x / 1.00x | 1.00x (1.00x-1.00x) | flat 3/3 | 0/5 |
+| featnorm | F4M | MPPT | 1.04x / 0.99x / 1.01x | 1.01x (0.99x-1.04x) | flat 3/3 | 0/5 |
+| featnorm | F6L | IPPT | 1.67x / 1.74x / 1.75x | 1.72x (1.67x-1.75x) | weak 3/3 | 0/5 |
+| featnorm | F6M | MPPT | 1.17x / 0.90x / 0.97x | 1.01x (0.90x-1.17x) | flat 3/3 | 0/5 |
+| featnorm | F7L | IPPT | 1.72x / 1.39x / 1.36x | 1.49x (1.36x-1.72x) | weak 3/3 | 1/5 (LocalOutlierFactor) |
+| featnorm | F7M | MPPT | 1.01x / 0.94x / 0.97x | 0.97x (0.94x-1.01x) | flat 3/3 | 0/5 |
+
+The proposed ratio is the median score of windows starting after 8 s divided by the median score of pre-injection windows ending before 7 s, excluding the first 0.5 s. Baseline counts come from `baseline_sanity.csv`; the denominator is the number of baseline models with post-injection data for that file.
+
+### Seed consistency
+
+| Score | Mode | Validation threshold mean (range) | Threshold CV | Max per-file flag-share range across seeds | Max per-file ratio spread across seeds (max/min) | Same rise class across seeds |
+|---|---|---|---|---|---|---|
+| plain | MPPT | 0.391791 (0.385935-0.399639) | 1.47% | 0.14 pp | 1.14x | 6/6 |
+| plain | IPPT | 0.443281 (0.414091-0.474312) | 5.55% | 8.09 pp | 1.23x | 6/7 |
+| featnorm | MPPT | 4.23948 (4.02601-4.52394) | 4.94% | 0.00 pp | 4.29x | 5/6 |
+| featnorm | IPPT | 4.49965 (4.01023-4.88885) | 8.13% | 0.00 pp | 1.82x | 6/7 |
+
+### Plain answers
+
+- (a) Healthy test false-alarm rates versus the validation rates (mean and range across the three seeds): plain MPPT: validation 1.07% (1.07%-1.07%), test 2.17% (1.92%-2.30%); plain IPPT: validation 1.05% (1.05%-1.05%), test 0.00% (0.00%-0.00%); featnorm MPPT: validation 1.07% (1.07%-1.07%), test 28.74% (16.86%-41.38%); featnorm IPPT: validation 1.05% (1.05%-1.05%), test 11.24% (8.61%-15.36%). The test rate is above the validation rate for plain MPPT, featnorm MPPT, featnorm IPPT.
+- (b) Post-8 s rise for F4, F6 and F7: plain clear-rise files: none; featnorm clear-rise files: none. Baseline clear-rise counts on the same six files are `F4L` 0/5, `F4M` 0/5, `F6L` 0/5, `F6M` 0/5, `F7L` 1/5, `F7M` 0/5 (clear rise is >= 2.0x the same file's pre-injection median). No proposed score shows a clear rise on any target file. `F3M` has no post-injection data and is excluded from this comparison.
+- (c) Seed consistency: the largest threshold coefficient of variation is 8.13%; the largest per-file flag-share range is 8.09 percentage points; the largest spread between the smallest and largest seed post/pre ratio is 4.29x (`featnorm` `MPPT` `F5M`, 77.23x-330.97x). The three seeds give the same clear/weak/flat rise class in 23/26 score/mode/file comparisons with post-injection data.
+- (d) Early stopping and convergence: epochs run ranged 92-100 and best epochs ranged 80-100. No run stopped before the very-early cut-off (<= 20 epochs); every run improved on its first-epoch validation loss; no run peaked at epoch 1. Total measured training time was 91.6 minutes on /CPU:0.
+
+Checks passed:
+- The proposed-model run reports 23/23 checks passed.
+- All 12 archives contain exactly the five baseline keys plus `feature_errors`, and all 128,688 saved window scores are finite.
+- Every threshold equals the 99th percentile of healthy validation scores recomputed from the saved archive; no healthy test or fault window was used.
+- Training and validation arrays are exactly the frozen healthy F0L/F0M splits (SHA-256 verified), and no fault file contributed a window.
+- The feature-error mean/std used for `featnorm` match the healthy validation windows exactly when recomputed from each saved model.
+- Batch scoring agrees with one-window-at-a-time scoring on sample windows for every run, mode, and file.
+- `plain` equals the mean of the saved feature errors, and `featnorm` equals the fixed k=3 formula recomputed from the saved feature errors.
+- Every flag rate in `proposed_sanity.csv` equals flagged/windows; `F3M` is marked as having zero post-injection windows for every score and seed.
+- The frozen Phase 1-3 modules `src/data.py` and `src/baselines.py` were not edited; `Untitled0.ipynb` was not modified.
+
+Problems or warnings:
+- No TensorFlow GPU was found; all training used `/CPU:0`. Measured training time was 91.6 minutes for six runs.
+- Windows overlap by 90%, so window-level observations are not independent; the sanity table is descriptive and has no confidence intervals or significance tests.
+- The frozen preprocessing keeps the `filtfilt` edge transient and the startup transient in the first windows, so those windows are learned as normal healthy behavior.
+- Mean whole-file fault flag shares per score/mode/file range from 86.28% to 100.00%; the lowest single-seed share is 82.69%. The whole-file view is close to saturation but not uniform.
+- Post/pre ratios in the tens, hundreds, or thousands occur when the post-injection score is far outside the healthy range; they are descriptive magnitudes, not calibrated effect sizes, and the exact ratio varies with seed.
+- The healthy recording drifts over time; a threshold fitted on the validation block can transfer imperfectly to the later test block. The test false-alarm rates above are the relevant measurement, not a guarantee.
+- `F3M` ends before 7 s and has no post-injection data. It is always reported as such and is excluded from the post-8 s comparison; no denominator was invented for it.
+- Comparisons with `baseline_sanity.csv` are descriptive. The baselines use the same frozen windows and threshold rule but different model classes; no statistical test was run.
+- No AUROC, precision, recall, F1, or other final metric was computed in this phase. The saved archives are the input to the Phase 5 evaluation.
+
+Decision needed from me: No. The architecture, fixed k=3, validation normalization, and threshold rule are frozen by this phase; Phase 5 can consume the saved archives without retuning anything after seeing fault sanity.
+
+Next phase: Phase 5 - final whole-file and time-resolved evaluation of the saved proposed-model score archives.

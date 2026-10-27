@@ -21,6 +21,8 @@ STEPS = [
     ("Phase 2 - labeling and timing diagnostic", PROJECT_ROOT / "src" / "time_diagnostic.py"),
     ("Phase 3 - baseline models", PROJECT_ROOT / "src" / "baselines.py"),
     ("Phase 3 - summary report", PROJECT_ROOT / "src" / "phase3_summary.py"),
+    ("Phase 4 - proposed TCN-BiLSTM training", PROJECT_ROOT / "src" / "train.py"),
+    ("Phase 4 - summary report", PROJECT_ROOT / "src" / "phase4_summary.py"),
 ]
 
 

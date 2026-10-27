@@ -178,3 +178,18 @@ because of the gaps. No model or fault evaluation exists yet.
 - Clear post-8 s rises (>=2.0x pre median) are unanimous for `F3L` and `F5L`; `F4L`, `F4M`, `F6L`, `F6M` and `F7M` have none. OneClassSVM MPPT is saturated at its score ceiling (93.79); LOF F1L has a negative pre median (-0.1278), so its ratio is undefined. F3M has no post-injection data.
 
 **Open issues/risks.** The whole-file view is saturated for `LocalOutlierFactor` and `Mahalanobis (window-mean)`, so it cannot separate methods. LOF and OneClassSVM have high healthy test false-alarm rates due to temporal drift within F0. OneClassSVM scores hit a ceiling, and LOF F1L has a negative pre median. F3M has no post-injection data. A reporting-only bug in the first draft (the saturated-model list compared per-mode counts with the 14-file total and printed `none`) was corrected before the final section was written; no model fit, score, threshold, or saved result changed.
+
+## 2026-10-27 - Phase 4: proposed TCN-BiLSTM autoencoder
+
+**What was done.** Copied the notebook's TCN-BiLSTM autoencoder unchanged into `src/model.py` and trained it healthy-only for MPPT and IPPT with seeds 0, 1 and 2. Each run used only the healthy training windows for fitting and healthy validation windows for early stopping. Two window scores (`plain` and fixed k=3 `featnorm`) were saved for every file, with thresholds at the 99th percentile of healthy validation scores. No fault file was used for training, normalization, thresholds, or model selection.
+
+**Files created/changed.** `src/model.py`, `src/train.py`, `src/phase4_summary.py`, `run_all.py`, `models/proposed_tcn_bilstm_<mode>_seed<k>.keras` (6), `results/history_<mode>_seed<k>.json` (6), `figures/training_curve_<mode>_seed<k>.png` (6), `results/scores_proposed_<score>_<mode>_seed<k>.npz` (12), `results/proposed_sanity.csv`, `results/proposed_training.csv`, `results/proposed_run_<mode>_seed<k>.json` (6), `results/proposed_metadata.json`, `results/phase4_summary_stats.json`, `logs/train.log`, `results/summary.md`, `STATUS.md`. Frozen `src/data.py`, `src/baselines.py`, and `Untitled0.ipynb` were not modified.
+
+**Key numbers (computed by `src/train.py` and `src/phase4_summary.py`).**
+- 6 runs, 12 archives, 128,688 saved window scores; 23/23 checks passed.
+- Epochs run 92-100; best epochs 80-100; total training time 91.6 min on `/CPU:0`.
+- Healthy test false-alarm rates: plain MPPT test 2.17% (1.92%-2.30%) vs validation 1.07%; plain IPPT test 0.00% (0.00%-0.00%) vs validation 1.05%; featnorm MPPT test 28.74% (16.86%-41.38%) vs validation 1.07%; featnorm IPPT test 11.24% (8.61%-15.36%) vs validation 1.05%.
+- F4/F6/F7 rise classes: plain `F4L` flat 3/3; plain `F4M` flat 3/3; plain `F6L` weak 3/3; plain `F6M` flat 3/3; plain `F7L` flat 3/3; plain `F7M` flat 3/3; featnorm `F4L` flat 3/3; featnorm `F4M` flat 3/3; featnorm `F6L` weak 3/3; featnorm `F6M` flat 3/3; featnorm `F7L` weak 3/3; featnorm `F7M` flat 3/3.
+- Seed consistency: largest threshold CV 8.13%; rise-class agreement 23/26; largest single-file seed ratio spread 4.29x.
+
+**Open issues/risks.** No GPU was available. Mean whole-file fault flag shares are 86.28%-100.00% (lowest single-seed share 82.69%), so the whole-file view is close to saturation; the pre/post-8 s comparison is the discriminating sanity view. `F3M` has no post-injection data. Windows overlap by 90%, and the healthy validation-to-test drift affects false-alarm transfer. No final metrics were computed.

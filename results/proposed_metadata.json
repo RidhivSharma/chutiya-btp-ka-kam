@@ -1,0 +1,675 @@
+{
+  "phase": "phase_4_proposed_tcn_bilstm",
+  "generated_utc": "2026-10-27T12:08:20.332609+00:00",
+  "git_commit": "9b52c371c3ba62b5f83652f54bf8dff858015bea",
+  "environment": {
+    "python": "3.13.1",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "numpy": "2.2.3",
+    "pandas": "2.2.3",
+    "scipy": "1.15.2",
+    "scikit-learn": "1.6.1"
+  },
+  "tensorflow": "2.20.0",
+  "keras": "3.15.1",
+  "device": "/CPU:0",
+  "gpus_found": [],
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "modes": [
+    "MPPT",
+    "IPPT"
+  ],
+  "architecture": "copied unchanged from Untitled0.ipynb: TCN blocks 32/32/64 dilations 1/2/4, BiLSTM 64, latent BiLSTM 32, RepeatVector, BiLSTM 32 and 64, TCN 64/32, TimeDistributed Dense",
+  "training": {
+    "max_epochs": 100,
+    "batch_size": 32,
+    "optimizer": "Adam",
+    "learning_rate": 0.001,
+    "early_stopping": {
+      "monitor": "val_loss",
+      "patience": 12,
+      "restore_best_weights": true
+    },
+    "reduce_lr": {
+      "monitor": "val_loss",
+      "factor": 0.5,
+      "patience": 5,
+      "min_lr": 1e-06
+    },
+    "training_data": "healthy training windows only (F0L for IPPT, F0M for MPPT)",
+    "validation_data": "healthy validation windows only (F0L for IPPT, F0M for MPPT)",
+    "fault_files_used": "none",
+    "determinism": {
+      "tf_enable_onednn_opts": "0",
+      "op_determinism": true,
+      "seed_function": "tf.keras.utils.set_random_seed"
+    }
+  },
+  "scoring": {
+    "plain": "mean squared error over time and 13 features",
+    "featnorm": "per-feature MSE over time; z = (e - val_mean) / max(val_std, 1e-8); negative z clipped to 0; window score = mean of the 3 largest z values",
+    "top_k": 3,
+    "top_k_note": "fixed before any fault scoring and never tuned",
+    "std_floor": 1e-08,
+    "feature_reference": "healthy validation windows only",
+    "threshold_rule": "99th percentile of each score on healthy validation windows",
+    "threshold_quantile": 0.99,
+    "flag_rule": "score > threshold",
+    "scoring_batch_size": 256
+  },
+  "runs": [
+    {
+      "mode": "MPPT",
+      "mode_suffix": "M",
+      "seed": 0,
+      "healthy_file": "F0M",
+      "windows": 10607,
+      "thresholds": {
+        "plain": 0.3996392069121058,
+        "featnorm": 4.168495687281036
+      },
+      "score_minmax": {
+        "plain": {
+          "min": 0.01511682920168714,
+          "max": 85181.06509929454
+        },
+        "featnorm": {
+          "min": 0.0,
+          "max": 826833.190157265
+        }
+      },
+      "scoring_time_s": 22.91551000007894,
+      "batch_vs_single": {
+        "comparisons": 30,
+        "max_plain_relative_difference": 4.6368973796023826e-07,
+        "max_feature_relative_difference": 4.265767480158209e-06,
+        "problems": []
+      },
+      "reference_recomputed_ok": true,
+      "reference_max_abs_difference": 0.0,
+      "archives": {
+        "plain": "results\\scores_proposed_plain_MPPT_seed0.npz",
+        "featnorm": "results\\scores_proposed_featnorm_MPPT_seed0.npz"
+      },
+      "feature_error_reference": {
+        "mean": [
+          0.1194480466381733,
+          1.0678121605306694,
+          0.1785296537125221,
+          0.00564157072161976,
+          0.0070414982288836735,
+          0.006860126955544319,
+          0.0057688485627610826,
+          0.006377308158278371,
+          0.0071373691832926,
+          0.02600031377052216,
+          0.24261774503799158,
+          0.0034501403731640188,
+          0.03567335956290261
+        ],
+        "std": [
+          0.06376854328207464,
+          1.27613608273075,
+          0.1073756203409272,
+          0.0027091486333244382,
+          0.0036096537018155575,
+          0.0038428404960104616,
+          0.003271410728508477,
+          0.003732125046735912,
+          0.004076432056011412,
+          0.0255247320726285,
+          0.23190658656908344,
+          0.002535733922787241,
+          0.025220155473575156
+        ]
+      },
+      "training_time_s": 662.4360023000045,
+      "train_windows": 840,
+      "val_windows": 280,
+      "max_epochs": 100,
+      "epochs_run": 100,
+      "best_epoch": 100,
+      "best_val_loss": 0.13171985745429993,
+      "final_val_loss": 0.13171985745429993,
+      "initial_val_loss": 0.8784866333007812,
+      "stopped_early": false,
+      "improved_over_initial": true,
+      "model_params": 288685,
+      "model_path": "models\\proposed_tcn_bilstm_MPPT_seed0.keras",
+      "history_path": "results\\history_MPPT_seed0.json",
+      "figure_path": "figures\\training_curve_MPPT_seed0.png"
+    },
+    {
+      "mode": "MPPT",
+      "mode_suffix": "M",
+      "seed": 1,
+      "healthy_file": "F0M",
+      "windows": 10607,
+      "thresholds": {
+        "plain": 0.3897989910384769,
+        "featnorm": 4.026012342412146
+      },
+      "score_minmax": {
+        "plain": {
+          "min": 0.013102201419653427,
+          "max": 85146.46869689543
+        },
+        "featnorm": {
+          "min": 0.0,
+          "max": 1109059.2263530234
+        }
+      },
+      "scoring_time_s": 22.785644700052217,
+      "batch_vs_single": {
+        "comparisons": 30,
+        "max_plain_relative_difference": 3.107965920319697e-07,
+        "max_feature_relative_difference": 6.284366120958614e-06,
+        "problems": []
+      },
+      "reference_recomputed_ok": true,
+      "reference_max_abs_difference": 0.0,
+      "archives": {
+        "plain": "results\\scores_proposed_plain_MPPT_seed1.npz",
+        "featnorm": "results\\scores_proposed_featnorm_MPPT_seed1.npz"
+      },
+      "feature_error_reference": {
+        "mean": [
+          0.11918960522942064,
+          1.0640869193843627,
+          0.13438510398350856,
+          0.007191511338094936,
+          0.007427621314564075,
+          0.007308754444276569,
+          0.006195455822641012,
+          0.006620525028360203,
+          0.006949125336702659,
+          0.020059772388589203,
+          0.21946585527581713,
+          0.003789599043418243,
+          0.03742829543090126
+        ],
+        "std": [
+          0.062478357888742675,
+          1.2665622814261384,
+          0.09946050729529167,
+          0.003702783145927821,
+          0.0037197705984007685,
+          0.004063594592677551,
+          0.0037302341250634746,
+          0.003508298809361009,
+          0.004073800262425128,
+          0.015476250226241384,
+          0.1750703139705319,
+          0.002305313297628643,
+          0.02653728057896598
+        ]
+      },
+      "training_time_s": 535.969264299958,
+      "train_windows": 840,
+      "val_windows": 280,
+      "max_epochs": 100,
+      "epochs_run": 92,
+      "best_epoch": 80,
+      "best_val_loss": 0.1261613965034485,
+      "final_val_loss": 0.12618911266326904,
+      "initial_val_loss": 0.8204696774482727,
+      "stopped_early": true,
+      "improved_over_initial": true,
+      "model_params": 288685,
+      "model_path": "models\\proposed_tcn_bilstm_MPPT_seed1.keras",
+      "history_path": "results\\history_MPPT_seed1.json",
+      "figure_path": "figures\\training_curve_MPPT_seed1.png"
+    },
+    {
+      "mode": "MPPT",
+      "mode_suffix": "M",
+      "seed": 2,
+      "healthy_file": "F0M",
+      "windows": 10607,
+      "thresholds": {
+        "plain": 0.38593484123848776,
+        "featnorm": 4.5239411090232435
+      },
+      "score_minmax": {
+        "plain": {
+          "min": 0.012184787167871679,
+          "max": 85149.90935457108
+        },
+        "featnorm": {
+          "min": 0.0,
+          "max": 965857.1376496108
+        }
+      },
+      "scoring_time_s": 28.360185300000012,
+      "batch_vs_single": {
+        "comparisons": 30,
+        "max_plain_relative_difference": 2.7153266929819556e-07,
+        "max_feature_relative_difference": 4.207348912537916e-06,
+        "problems": []
+      },
+      "reference_recomputed_ok": true,
+      "reference_max_abs_difference": 0.0,
+      "archives": {
+        "plain": "results\\scores_proposed_plain_MPPT_seed2.npz",
+        "featnorm": "results\\scores_proposed_featnorm_MPPT_seed2.npz"
+      },
+      "feature_error_reference": {
+        "mean": [
+          0.11814715953868955,
+          1.0616542108441716,
+          0.11895694797519185,
+          0.007057620987135013,
+          0.007231785128060101,
+          0.008507706513511988,
+          0.006681018999189552,
+          0.006860567017172679,
+          0.007119122148449541,
+          0.016974130257660553,
+          0.19481238380213592,
+          0.0010632382764945306,
+          0.0347522450999362
+        ],
+        "std": [
+          0.06447744087172022,
+          1.2609475628867892,
+          0.08946531003589327,
+          0.004566469707475673,
+          0.0040518090118414245,
+          0.005054321955583396,
+          0.0048233587065331564,
+          0.00443790791240726,
+          0.004894643258673625,
+          0.020003945839162703,
+          0.1892737355931867,
+          0.0005562086146062882,
+          0.02587237964257494
+        ]
+      },
+      "training_time_s": 650.0266785999993,
+      "train_windows": 840,
+      "val_windows": 280,
+      "max_epochs": 100,
+      "epochs_run": 100,
+      "best_epoch": 100,
+      "best_val_loss": 0.12229370325803757,
+      "final_val_loss": 0.12229370325803757,
+      "initial_val_loss": 0.8329766988754272,
+      "stopped_early": false,
+      "improved_over_initial": true,
+      "model_params": 288685,
+      "model_path": "models\\proposed_tcn_bilstm_MPPT_seed2.keras",
+      "history_path": "results\\history_MPPT_seed2.json",
+      "figure_path": "figures\\training_curve_MPPT_seed2.png"
+    },
+    {
+      "mode": "IPPT",
+      "mode_suffix": "L",
+      "seed": 0,
+      "healthy_file": "F0L",
+      "windows": 10841,
+      "thresholds": {
+        "plain": 0.4140907821402197,
+        "featnorm": 4.888850831909774
+      },
+      "score_minmax": {
+        "plain": {
+          "min": 0.015936924756601294,
+          "max": 93372.75772861546
+        },
+        "featnorm": {
+          "min": 0.0,
+          "max": 449213.6329485637
+        }
+      },
+      "scoring_time_s": 60.61997189989779,
+      "batch_vs_single": {
+        "comparisons": 30,
+        "max_plain_relative_difference": 2.409774299068885e-07,
+        "max_feature_relative_difference": 5.6487655441657436e-06,
+        "problems": []
+      },
+      "reference_recomputed_ok": true,
+      "reference_max_abs_difference": 0.0,
+      "archives": {
+        "plain": "results\\scores_proposed_plain_IPPT_seed0.npz",
+        "featnorm": "results\\scores_proposed_featnorm_IPPT_seed0.npz"
+      },
+      "feature_error_reference": {
+        "mean": [
+          0.08301677630901183,
+          0.9032028896191643,
+          0.14124475022842636,
+          0.00809173827363693,
+          0.008256412575834114,
+          0.008188892199764283,
+          0.007981434479163926,
+          0.0073887403964606165,
+          0.007057420771135463,
+          0.016701639846939353,
+          0.2896159769284905,
+          0.0033815735515225057,
+          0.18338254280468433
+        ],
+        "std": [
+          0.05830204588865479,
+          0.9405225492495296,
+          0.12754623494687517,
+          0.006420460749769794,
+          0.006335696774597277,
+          0.006439977470877387,
+          0.005947413944430084,
+          0.005959818635695764,
+          0.005742547574678303,
+          0.012885285838813399,
+          0.336013442837292,
+          0.0017348485401459056,
+          0.15731270734295513
+        ]
+      },
+      "training_time_s": 1108.6993568000617,
+      "train_windows": 856,
+      "val_windows": 285,
+      "max_epochs": 100,
+      "epochs_run": 100,
+      "best_epoch": 100,
+      "best_val_loss": 0.12827005982398987,
+      "final_val_loss": 0.12827005982398987,
+      "initial_val_loss": 0.8908212184906006,
+      "stopped_early": false,
+      "improved_over_initial": true,
+      "model_params": 288685,
+      "model_path": "models\\proposed_tcn_bilstm_IPPT_seed0.keras",
+      "history_path": "results\\history_IPPT_seed0.json",
+      "figure_path": "figures\\training_curve_IPPT_seed0.png"
+    },
+    {
+      "mode": "IPPT",
+      "mode_suffix": "L",
+      "seed": 1,
+      "healthy_file": "F0L",
+      "windows": 10841,
+      "thresholds": {
+        "plain": 0.44144147844559534,
+        "featnorm": 4.599856953305408
+      },
+      "score_minmax": {
+        "plain": {
+          "min": 0.017508921819803965,
+          "max": 93404.78283058997
+        },
+        "featnorm": {
+          "min": 0.0,
+          "max": 433759.51662343723
+        }
+      },
+      "scoring_time_s": 60.63526949996594,
+      "batch_vs_single": {
+        "comparisons": 30,
+        "max_plain_relative_difference": 2.16045321621331e-07,
+        "max_feature_relative_difference": 5.65279228441544e-06,
+        "problems": []
+      },
+      "reference_recomputed_ok": true,
+      "reference_max_abs_difference": 0.0,
+      "archives": {
+        "plain": "results\\scores_proposed_plain_IPPT_seed1.npz",
+        "featnorm": "results\\scores_proposed_featnorm_IPPT_seed1.npz"
+      },
+      "feature_error_reference": {
+        "mean": [
+          0.08605593024400314,
+          0.9133485493518795,
+          0.13399424954054634,
+          0.010857799485555986,
+          0.011021181692097376,
+          0.011264997024790073,
+          0.01062004930308764,
+          0.00993439690764559,
+          0.010807348480835586,
+          0.021075569866084734,
+          0.26638208647644973,
+          0.002238032444373779,
+          0.20626702237942424
+        ],
+        "std": [
+          0.06065792201156551,
+          0.9638840049973634,
+          0.12350595910283191,
+          0.007482957628745597,
+          0.006666767572562059,
+          0.007250101144233931,
+          0.007895591413029911,
+          0.007460520168603217,
+          0.007979481374271433,
+          0.01841455336866522,
+          0.23568904629637694,
+          0.0015188570424899356,
+          0.1832673212383515
+        ]
+      },
+      "training_time_s": 1179.48093900003,
+      "train_windows": 856,
+      "val_windows": 285,
+      "max_epochs": 100,
+      "epochs_run": 100,
+      "best_epoch": 100,
+      "best_val_loss": 0.1302974820137024,
+      "final_val_loss": 0.1302974820137024,
+      "initial_val_loss": 0.8378008008003235,
+      "stopped_early": false,
+      "improved_over_initial": true,
+      "model_params": 288685,
+      "model_path": "models\\proposed_tcn_bilstm_IPPT_seed1.keras",
+      "history_path": "results\\history_IPPT_seed1.json",
+      "figure_path": "figures\\training_curve_IPPT_seed1.png"
+    },
+    {
+      "mode": "IPPT",
+      "mode_suffix": "L",
+      "seed": 2,
+      "healthy_file": "F0L",
+      "windows": 10841,
+      "thresholds": {
+        "plain": 0.47431158319005357,
+        "featnorm": 4.010233675233476
+      },
+      "score_minmax": {
+        "plain": {
+          "min": 0.015625692381570414,
+          "max": 93448.58526303928
+        },
+        "featnorm": {
+          "min": 0.0,
+          "max": 440682.8361973271
+        }
+      },
+      "scoring_time_s": 74.2722916000057,
+      "batch_vs_single": {
+        "comparisons": 30,
+        "max_plain_relative_difference": 4.514369294776831e-07,
+        "max_feature_relative_difference": 9.729430399980554e-06,
+        "problems": []
+      },
+      "reference_recomputed_ok": true,
+      "reference_max_abs_difference": 0.0,
+      "archives": {
+        "plain": "results\\scores_proposed_plain_IPPT_seed2.npz",
+        "featnorm": "results\\scores_proposed_featnorm_IPPT_seed2.npz"
+      },
+      "feature_error_reference": {
+        "mean": [
+          0.08694363760798866,
+          0.9210204078138601,
+          0.15536363452470464,
+          0.009545064501174063,
+          0.009688167795311349,
+          0.011458266281008338,
+          0.008309792777898376,
+          0.00791326225998966,
+          0.00938899833003534,
+          0.03282069219699521,
+          0.34749236564068176,
+          0.0027642486621063055,
+          0.21985384976779546
+        ],
+        "std": [
+          0.0653659764499972,
+          0.9686120004055379,
+          0.13721148006353123,
+          0.0070553336346741045,
+          0.006795186946490532,
+          0.00715732819203417,
+          0.0048846473898841985,
+          0.004796889196900467,
+          0.005992029599023353,
+          0.03398189876759115,
+          0.33413576840118697,
+          0.0017821862489812163,
+          0.20070687274333734
+        ]
+      },
+      "training_time_s": 1356.4130081998883,
+      "train_windows": 856,
+      "val_windows": 285,
+      "max_epochs": 100,
+      "epochs_run": 100,
+      "best_epoch": 100,
+      "best_val_loss": 0.14019711315631866,
+      "final_val_loss": 0.14019711315631866,
+      "initial_val_loss": 0.8548977971076965,
+      "stopped_early": false,
+      "improved_over_initial": true,
+      "model_params": 288685,
+      "model_path": "models\\proposed_tcn_bilstm_IPPT_seed2.keras",
+      "history_path": "results\\history_IPPT_seed2.json",
+      "figure_path": "figures\\training_curve_IPPT_seed2.png"
+    }
+  ],
+  "training_csv": "results\\proposed_training.csv",
+  "sanity_csv": "results\\proposed_sanity.csv",
+  "training_rows": 6,
+  "sanity_rows": 108,
+  "checks_passed": 23,
+  "checks_total": 23,
+  "checks": [
+    {
+      "name": "MPPT training arrays are exactly healthy train windows",
+      "passed": true,
+      "detail": "F0M: 840 train, 280 val windows"
+    },
+    {
+      "name": "IPPT training arrays are exactly healthy train windows",
+      "passed": true,
+      "detail": "F0L: 856 train, 285 val windows"
+    },
+    {
+      "name": "every mode/seed run completed",
+      "passed": true,
+      "detail": "6 runs"
+    },
+    {
+      "name": "every proposed archive has exactly the five baseline keys plus feature_errors",
+      "passed": true,
+      "detail": "keys = scores, start_time, end_time, threshold, name, feature_errors"
+    },
+    {
+      "name": "score/time/name/feature-error arrays have matching lengths",
+      "passed": true,
+      "detail": "12 archives checked"
+    },
+    {
+      "name": "all scores, times, thresholds, and feature errors are finite",
+      "passed": true,
+      "detail": "128,688 window scores across 12 archives"
+    },
+    {
+      "name": "feature_errors has shape (n_windows, 13) and is non-negative",
+      "passed": true,
+      "detail": "13 features per window"
+    },
+    {
+      "name": "every archive has the expected nine groups and window counts",
+      "passed": true,
+      "detail": "healthy train/val/test and seven fault files per mode"
+    },
+    {
+      "name": "every threshold equals the saved healthy-validation p99",
+      "passed": true,
+      "detail": "no healthy test or fault window used for a threshold"
+    },
+    {
+      "name": "plain scores equal the mean of the saved feature errors",
+      "passed": true,
+      "detail": "mean squared error over time and 13 features"
+    },
+    {
+      "name": "featnorm scores equal the fixed k=3 formula from saved feature errors",
+      "passed": true,
+      "detail": "validation-only mean/std, negative z clipped, top-3 mean"
+    },
+    {
+      "name": "training and validation arrays match the frozen healthy splits exactly",
+      "passed": true,
+      "detail": "IPPT/seed0 F0L, IPPT/seed1 F0L, IPPT/seed2 F0L, MPPT/seed0 F0M, MPPT/seed1 F0M, MPPT/seed2 F0M (SHA-256 verified)"
+    },
+    {
+      "name": "no fault file contributed any training or validation window",
+      "passed": true,
+      "detail": "all source files are F0L/F0M"
+    },
+    {
+      "name": "healthy train and validation window indices are disjoint",
+      "passed": true,
+      "detail": "train/validation intersection is empty"
+    },
+    {
+      "name": "feature-error mean/std match the healthy validation windows exactly",
+      "passed": true,
+      "detail": "recomputed from the saved model for all runs; max abs difference=0"
+    },
+    {
+      "name": "batch scoring equals one-window-at-a-time scoring on sample windows",
+      "passed": true,
+      "detail": "180 windows compared across all runs; max relative diff plain=4.64e-07, feature=9.73e-06"
+    },
+    {
+      "name": "training table has one row per completed mode/seed run",
+      "passed": true,
+      "detail": "6 rows, expected 6"
+    },
+    {
+      "name": "epochs run and best epoch are internally consistent",
+      "passed": true,
+      "detail": "1 <= best_epoch <= epochs_run <= max_epochs"
+    },
+    {
+      "name": "best and final validation losses are finite",
+      "passed": true,
+      "detail": "no NaN or infinite val_loss"
+    },
+    {
+      "name": "sanity table has one row per score/run/group",
+      "passed": true,
+      "detail": "108 rows, expected 108 for 6 runs x 2 scores x 9 groups"
+    },
+    {
+      "name": "every flag rate equals flagged/windows",
+      "passed": true,
+      "detail": "healthy and fault rows"
+    },
+    {
+      "name": "F3M is marked as having no post-injection data",
+      "passed": true,
+      "detail": "6 score/seed rows; post windows = 0"
+    },
+    {
+      "name": "no file other than F3M is marked as lacking post-injection data",
+      "passed": true,
+      "detail": "all other fault files have post-8 s windows"
+    }
+  ]
+}
