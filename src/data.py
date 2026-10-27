@@ -41,6 +41,7 @@ import platform
 import subprocess
 import sys
 from datetime import datetime, timezone
+from functools import lru_cache
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
@@ -83,6 +84,16 @@ WINDOW_SIZE = 100
 STRIDE = 10
 SPLIT_FRACTIONS = (0.6, 0.2, 0.2)
 SPLIT_GAP_WINDOWS = 10
+
+# Label definitions used by the Phase 2 timing diagnostic. They are additive:
+# none of the preprocessing outputs above depends on them.
+LABEL_MODES = ("whole_file", "time_resolved")
+HEALTHY_LABEL = 0
+FAULT_LABEL = 1
+PRE_FAULT_LABEL = -1
+INJECTION_OVERLAP_LABEL = -2
+FAULT_START_S = 7.0
+FAULT_END_S = 8.0
 
 
 def package_version(name: str) -> str | None:
@@ -241,6 +252,105 @@ def make_windows(
         )
 
     return windows.astype(np.float32), window_times.astype(np.float64)
+
+
+@lru_cache(maxsize=len(STEMS))
+def _window_time_bounds(name: str) -> np.ndarray:
+    """Return cached (start_time, end_time) for every window of one file.
+
+    Only the ``Time`` column is needed for labelling. Anti-alias filtering does
+    not change timestamps: ``decimate_file`` returns ``time[::10]``, so slicing
+    the validated Time column here gives exactly the same window bounds as
+    ``build_dataset`` without decimating all 13 feature columns again.
+    """
+    if name not in STEMS:
+        raise ValueError(f"Unknown dataset file: {name!r}")
+
+    _, time = load_file(name)
+    decimated_time = time[::DOWNSAMPLE_FACTOR].copy()
+    count = window_count(decimated_time.size)
+    if count == 0:
+        return np.empty((0, 2), dtype=np.float64)
+
+    starts = np.arange(
+        0, decimated_time.size - WINDOW_SIZE + 1, STRIDE
+    )
+    return np.column_stack(
+        (decimated_time[starts], decimated_time[starts + WINDOW_SIZE - 1])
+    ).astype(np.float64)
+
+
+def get_labels(
+    name: str,
+    label_mode: str,
+    times: np.ndarray | None = None,
+) -> np.ndarray:
+    """Return one integer label per window of ``name``.
+
+    Parameters
+    ----------
+    name
+        File stem, one of ``STEMS`` (for example ``"F3M"``).
+    label_mode
+        ``"whole_file"`` labels every window of a fault file as faulty (1),
+        reproducing the notebook/reference-paper convention. ``"time_resolved"``
+        uses the documented fault-injection interval of 7.0-8.0 s:
+
+        * ``-1``: the window ends before 7.0 s (pre-fault; excluded from the
+          fault class but retained for false-alarm analysis),
+        * ``1``: the window starts after 8.0 s (post-injection fault),
+        * ``-2``: the window overlaps 7.0-8.0 s and is dropped from both the
+          pre-fault and fault sets.
+
+        Healthy files (``F0L``/``F0M``) are labelled 0 in both modes.
+    times
+        Optional ``(n_windows, 2)`` array of (start_time, end_time) seconds.
+        When omitted, the bounds are read from the file's Time column. Passing
+        ``data["times"][name]`` avoids a second read and guarantees that labels
+        and model inputs refer to identical windows.
+
+    A file that ends before 7.0 s (``F3M``) gets only ``-1`` labels in
+    ``"time_resolved"`` mode; no exception is raised and no post-injection
+    share is invented downstream.
+    """
+    if name not in STEMS:
+        raise ValueError(f"Unknown dataset file: {name!r}")
+    if label_mode not in LABEL_MODES:
+        raise ValueError(
+            f"Unknown label_mode {label_mode!r}; expected one of {LABEL_MODES}"
+        )
+
+    if times is None:
+        bounds = _window_time_bounds(name)
+    else:
+        bounds = np.asarray(times, dtype=np.float64)
+        if bounds.ndim != 2 or bounds.shape[1] != 2:
+            raise ValueError(
+                f"{name}: times must have shape (n_windows, 2), "
+                f"got {bounds.shape}"
+            )
+        if not np.isfinite(bounds).all():
+            raise ValueError(f"{name}: times contain non-finite values")
+        if np.any(bounds[:, 1] < bounds[:, 0]):
+            raise ValueError(f"{name}: a window ends before it starts")
+
+    n_windows = int(bounds.shape[0])
+    if name[1] == "0":
+        return np.zeros(n_windows, dtype=np.int8)
+    if label_mode == "whole_file":
+        return np.ones(n_windows, dtype=np.int8)
+
+    labels = np.full(n_windows, INJECTION_OVERLAP_LABEL, dtype=np.int8)
+    pre_fault = bounds[:, 1] < FAULT_START_S
+    post_fault = bounds[:, 0] > FAULT_END_S
+    if np.any(pre_fault & post_fault):
+        raise RuntimeError(
+            f"{name}: a window cannot both end before {FAULT_START_S} s "
+            f"and start after {FAULT_END_S} s"
+        )
+    labels[pre_fault] = PRE_FAULT_LABEL
+    labels[post_fault] = FAULT_LABEL
+    return labels
 
 
 def make_healthy_split(

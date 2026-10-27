@@ -1,0 +1,145 @@
+{
+  "phase": "phase_2_labeling_time_diagnostic_summary",
+  "generated_local": "2026-10-26T14:30:02.869498+05:30",
+  "date": "2026-10-26",
+  "git_commit": "9e0b8386e74e151781ad4a05eb066ff5694fd307",
+  "environment": {
+    "python": "3.13.1",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "numpy": "2.2.3",
+    "pandas": "2.2.3",
+    "scipy": "1.15.2",
+    "scikit-learn": "1.6.1"
+  },
+  "source_files": {
+    "label_diagnostic": "results/label_diagnostic.csv",
+    "healthy_false_alarm": "results/healthy_false_alarm.csv",
+    "time_diagnostic_scores": "results/time_diagnostic_scores.csv",
+    "time_diagnostic": "results/time_diagnostic.json",
+    "sanity_checks": "results/sanity_checks.json"
+  },
+  "totals": {
+    "windows_scored": 21488,
+    "fault_files": 14,
+    "fault_modes": 14,
+    "score_min": 1.3449395844028362,
+    "score_max": 10821.962367819511,
+    "score_nan": 0
+  },
+  "detector": {
+    "name": "placeholder_window_mean_mahalanobis",
+    "ridge_relative": 1e-06,
+    "ridge_by_mode": {
+      "IPPT": 1.8050974070346542e-07,
+      "MPPT": 2.265234400261547e-07
+    },
+    "condition_number_by_mode": {
+      "IPPT": 7003398.104339042,
+      "MPPT": 7683174.077629795
+    },
+    "threshold_by_mode": {
+      "IPPT": 5.300718950653503,
+      "MPPT": 6.6192048940610295
+    },
+    "fault_files_used_for_fit": 0,
+    "fault_files_used_for_threshold": 0
+  },
+  "healthy_test": {
+    "IPPT": 0.0074906367041198,
+    "MPPT": 0.0076628352490421,
+    "IPPT_flagged": 2,
+    "IPPT_windows": 267,
+    "MPPT_flagged": 2,
+    "MPPT_windows": 261
+  },
+  "pre_injection": {
+    "windows_min": 640,
+    "windows_max": 641,
+    "share_min": 1.0,
+    "share_max": 1.0,
+    "median_over_threshold_min": 4.1137632310967245,
+    "median_over_threshold_max": 532.299330429613,
+    "all_files_fully_flagged": true
+  },
+  "startup": {
+    "windows_min": 50,
+    "windows_max": 51,
+    "share_min": 1.0,
+    "share_max": 1.0,
+    "max_relative_difference": 0.11300931625869398,
+    "all_flagged": true
+  },
+  "timing": {
+    "clear_post_files": [
+      "F1L",
+      "F1M",
+      "F2L",
+      "F3L",
+      "F5L",
+      "F5M"
+    ],
+    "weak_post_files": [
+      "F2M"
+    ],
+    "flat_post_files": [
+      "F4L",
+      "F4M",
+      "F6L",
+      "F6M",
+      "F7L",
+      "F7M"
+    ],
+    "interval_jump_files": [
+      "F5L",
+      "F5M"
+    ],
+    "post_only_jump_files": [
+      "F1L",
+      "F1M",
+      "F2L",
+      "F3L"
+    ],
+    "no_post_files": [
+      "F3M"
+    ],
+    "interval_ratio_min": 9.717942661150811,
+    "interval_ratio_max": 260.1245376743708,
+    "post_only_ratio_min": 2.3796464666822192,
+    "post_only_ratio_max": 37.73275727341732,
+    "flat_ratio_min": 0.992124531744541,
+    "flat_ratio_max": 1.0152370211432615,
+    "flat_max_abs_deviation": 0.015237021143261531,
+    "weak_ratio": 1.2046773589958897,
+    "post_share_min": 1.0,
+    "post_share_max": 1.0,
+    "all_pre_and_post_flagged": true,
+    "undefined_post_fields": 6,
+    "clear_jump_ratio_convention": 2.0,
+    "weak_jump_ratio_convention": 1.2
+  },
+  "f3m": {
+    "windows_total": 690,
+    "windows_before_7s": 690,
+    "windows_7_to_8s": 0,
+    "windows_after_8s": 0,
+    "last_window_end_s": 6.98838109771922,
+    "no_post_injection_data": true
+  },
+  "meta_checks": {
+    "passed": 9,
+    "total": 9
+  },
+  "sanity_checks": {
+    "passed": 30,
+    "total": 30,
+    "all_passed": true
+  },
+  "undefined_post_columns": [
+    "share_flagged_7_to_8s",
+    "share_flagged_after_8s",
+    "median_score_7_to_8s",
+    "median_score_after_8s",
+    "median_score_ratio_7_to_8_over_before_7",
+    "median_score_ratio_after_8_over_before_7"
+  ]
+}

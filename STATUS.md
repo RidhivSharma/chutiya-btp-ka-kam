@@ -147,3 +147,19 @@ trim them before modeling. `F3M` needs explicit coverage reporting; `F2L`
 timestamp jitter remains; filtfilt edge transients are kept; windows within a
 split are 90% overlapped; test shares are 18.70% (IPPT) and 18.63% (MPPT)
 because of the gaps. No model or fault evaluation exists yet.
+
+---
+## 2026-10-26 - Phase 2: labeling and timing diagnostic
+
+**What was done.** Added `get_labels` to `src/data.py` with `whole_file` and `time_resolved` modes (-1 before 7 s, -2 for 7-8 s overlap, 1 after 8 s). Built a placeholder detector from healthy training window means only: Mahalanobis distance with a pseudo-inverse and small relative ridge, thresholded at the 99th percentile of healthy validation scores. Scored all 21,488 windows, wrote per-fault timing shares and healthy false-alarm rates, and drew 14 individual figures plus a 7x2 grid. No model setting was tuned on fault results.
+
+**Files created/changed.** `src/data.py` (added `get_labels` and a cached window-time helper; existing outputs unchanged), `src/time_diagnostic.py`, `src/phase2_summary.py`, `run_all.py`, `results/time_diagnostic_scores.csv`, `results/label_diagnostic.csv`, `results/healthy_false_alarm.csv`, `results/time_diagnostic.json`, `results/phase2_summary_stats.json`, `figures/score_vs_time_*.png`, `results/summary.md`, `STATUS.md`.
+
+**Key numbers (computed by code).**
+- 21,488 windows scored across 16 files; 14 fault files in two modes. Score range 1.34 to 1.08e+04.
+- Pre-injection flag share (excluding the first 0.5 s): 1.0000 to 1.0000 across all fault files; median pre-injection score was 4.1x to 532.3x the threshold.
+- Healthy test false-alarm rate: 0.0075 IPPT and 0.0077 MPPT.
+- Post/pre median-score ratios: clear for `F1L`, `F1M`, `F2L`, `F3L`, `F5L`, `F5M`; weak for `F2M`; flat for `F4L`, `F4M`, `F6L`, `F6M`, `F7L`, `F7M`; `F3M` has no post-injection data.
+- Post-injection flag shares are 1.0000 to 1.0000 where post data exist, so the binary flag does not localize the onset; `F3M` has 0 post-injection windows.
+
+**Open issues/risks.** The placeholder is saturated on fault files, so pre-injection anomaly cannot be separated from a run-level operating-point offset. `F3M` ends before 7 s and has no post-injection data. The label convention for final evaluation (whole-file versus time-resolved) is still a decision.

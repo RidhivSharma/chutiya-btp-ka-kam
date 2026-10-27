@@ -122,3 +122,84 @@ Problems or warnings:
 Decision needed from me: Yes - confirm that these Phase 1 choices are frozen for modeling: 1,000 Hz anti-aliased data, 100-sample windows with stride 10, one scaler per operating mode, and a chronological 60/20/20 healthy split with two 10-window gaps (the test share is 18.7% IPPT and 18.6% MPPT). If not, say which choice should be revisited.
 
 Next phase: Phase 2 - train and validate a healthy-only anomaly detector on these frozen windows, keeping fault files unseen until final evaluation.
+
+## Phase 2: Labeling and timing diagnostic   (2026-10-26 14:30 +0530)
+
+What was done: Phase 2 checked whether the fault recordings already look faulty before the documented 7-8 s injection interval, and whether the first 0.5 s startup transient is flagged. The diagnostic uses a deliberately simple placeholder: for each mode it fits a 13-feature mean and covariance to healthy training window means, scores every window by Mahalanobis distance with a pseudo-inverse and a small relative ridge, and sets the threshold at the 99th percentile of healthy validation scores. Fault files were never used to fit the mean/covariance or the threshold. `get_labels` adds whole-file labels (every F1-F7 window faulty) and time-resolved labels (-1 before 7 s, -2 for windows overlapping 7-8 s, 1 after 8 s); `F3M` gets only -1 labels because its last window ends at 6.988 s. All 21,488 windows of the 16 files were scored. The placeholder flagged 100.00% of the pre-injection windows outside the startup period, versus 0.75% and 0.77% false alarms on healthy test data for IPPT and MPPT.
+
+Files created or changed:
+- `src/data.py` - added `get_labels` and a cached window-time helper; existing preprocessing outputs are unchanged.
+- `src/time_diagnostic.py` - fits the placeholder, scores all windows, writes the diagnostic tables, and draws the figures.
+- `src/phase2_summary.py` - reads the saved results and writes this section and the STATUS entry.
+- `run_all.py` - added the labeling and timing diagnostic as a pipeline step.
+- `results/time_diagnostic_scores.csv` - one row per window with score, threshold, flag, timestamps, and both label modes.
+- `results/label_diagnostic.csv` - per-fault pre/startup/7-8/post flag shares and median-score ratios.
+- `results/healthy_false_alarm.csv` - healthy train/validation/test false-alarm rates for the placeholder.
+- `results/time_diagnostic.json` - detector definition, fitted parameters, thresholds, and all check results.
+- `results/phase2_summary_stats.json` - the facts used in this report.
+- `figures/score_vs_time_F1L.png` ... `score_vs_time_F7M.png` - 14 individual score-versus-time plots.
+- `figures/score_vs_time_grid.png` - 7 faults by 2 modes summary grid.
+- `results/summary.md` - this Phase 2 section.
+- `STATUS.md` - appended Phase 2 log entry.
+
+Key numbers:
+
+### Placeholder detector and healthy reference
+
+| Mode | Healthy train windows | Healthy validation windows | Healthy test windows | Threshold | Validation flagged | Healthy test flagged (false-alarm rate) |
+|---|---|---|---|---|---|---|
+| IPPT | 856 | 285 | 267 | 5.301 | 3 (1.05%) | 2/267 (0.75%) |
+| MPPT | 840 | 280 | 261 | 6.619 | 3 (1.07%) | 2/261 (0.77%) |
+
+The detector is fitted on the healthy training windows of each mode, and the threshold is the 99th percentile of that mode's healthy validation scores. The healthy test rows are unseen by both the fit and the threshold.
+
+### Per-fault timing diagnostic
+
+| File | Windows before 7 s | Flagged before 7 s (excl. startup) | Flagged startup (first 0.5 s) | Flagged 7-8 s | Flagged after 8 s | Pre median / threshold | 7-8 s / pre median | After 8 s / pre median | No post-injection data |
+|---|---|---|---|---|---|---|---|---|---|
+| `F1L` | 691 | 100.00% | 100.00% | 100.00% | 100.00% | 15.14x | 0.99x | 2.38x | no |
+| `F1M` | 691 | 100.00% | 100.00% | 100.00% | 100.00% | 32.17x | 1.00x | 37.73x | no |
+| `F2L` | 691 | 100.00% | 100.00% | 100.00% | 100.00% | 8.02x | 0.98x | 10.00x | no |
+| `F2M` | 691 | 100.00% | 100.00% | 100.00% | 100.00% | 74.75x | 1.00x | 1.20x | no |
+| `F3L` | 691 | 100.00% | 100.00% | 100.00% | 100.00% | 7.78x | 1.01x | 12.57x | no |
+| `F3M` | 690 | 100.00% | 100.00% | NA | NA | 8.83x | NA | NA | yes |
+| `F4L` | 691 | 100.00% | 100.00% | 100.00% | 100.00% | 532.30x | 1.00x | 1.00x | no |
+| `F4M` | 691 | 100.00% | 100.00% | 100.00% | 100.00% | 38.66x | 1.00x | 1.00x | no |
+| `F5L` | 691 | 100.00% | 100.00% | 100.00% | 100.00% | 4.11x | 260.12x | 37.27x | no |
+| `F5M` | 691 | 100.00% | 100.00% | 100.00% | 100.00% | 53.13x | 9.72x | 22.91x | no |
+| `F6L` | 691 | 100.00% | 100.00% | 100.00% | 100.00% | 4.86x | 0.99x | 1.02x | no |
+| `F6M` | 691 | 100.00% | 100.00% | 100.00% | 100.00% | 28.52x | 1.00x | 1.00x | no |
+| `F7L` | 691 | 100.00% | 100.00% | 100.00% | 100.00% | 8.37x | 0.98x | 0.99x | no |
+| `F7M` | 691 | 100.00% | 100.00% | 100.00% | 100.00% | 47.99x | 1.00x | 1.00x | no |
+
+Shares are fractions of the relevant window group. `Windows before 7 s` counts windows whose end time is before 7.0 s. The pre-injection share excludes windows that start in the first 0.5 s; the startup share uses those windows. The 7-8 s group is the set of windows that overlap the documented injection interval and is dropped by the time-resolved labels. `NA` means the denominator is zero.
+
+### Answers to the four timing questions
+
+- (a) Pre-injection part: anomalous to this placeholder. All 14 fault files have 640-641 pre-injection windows after the first 0.5 s, and 100.00% of those windows were flagged. The median pre-injection score was 4.11x to 532.30x the threshold, while healthy test false-alarm rates were 0.75% (IPPT) and 0.77% (MPPT). This says the pre-injection segment differs from the healthy training file under this detector; it does not prove that the fault was already active, because a run-level operating-point offset can produce the same result.
+- (b) Score jump at 7-8 s: The binary flag share cannot show a jump because every pre-injection and post-injection window is already above the healthy threshold. Inside the 7-8 s interval, `F5L`, `F5M` rise (9.72x to 260.12x of the pre-injection median). After 8 s, `F1L`, `F1M`, `F2L`, `F3L` rise (2.38x to 37.73x). `F4L`, `F4M`, `F6L`, `F6M`, `F7L`, `F7M` stay within 1.5% of their pre-injection median. `F2M` is intermediate at 1.20x.
+- (c) Startup transient: flagged, but not separately. The 50-51 windows starting in the first 0.5 s of each fault file were flagged in every file (100.00%), and their median score differed from the pre-injection median by at most 11.3%. The whole pre-injection segment is already above threshold, so this is not evidence of a distinct startup effect.
+- (d) No clear timing signal: `F4L`, `F4M`, `F6L`, `F6M`, `F7L`, `F7M` have post/pre median ratios of 0.99x to 1.02x, i.e. essentially flat. `F2M` is weak at 1.20x. `F3M` cannot be assessed: it has 0 post-injection windows and its last window ends at 6.988 s. At the binary flag level none of the files shows a timing change, because every fault window is already flagged.
+
+Checks passed:
+- Existing preprocessing is unchanged: the sanity-check file reports 30/30 checks passed after adding `get_labels`.
+- The diagnostic reports 9/9 checks passed.
+- All 21,488 windows of all 16 files were scored; scores are finite and non-negative (1.34 to 1.08e+04).
+- Saved time-resolved labels match `get_labels` after the CSV round-trip, use only -2/-1/0/1, and partition every fault file into pre/overlap/post windows.
+- `F3M` is handled without crashing: 690 pre-fault windows, 0 windows in 7-8 s, and 0 post-injection windows.
+- The healthy reference contains only `F0L`/`F0M`, and each false-alarm rate equals flagged/windows (IPPT 2/267, MPPT 2/261).
+- The detector mean/covariance and the 99th-percentile threshold use healthy training and validation windows only; 0 fault files were used for either.
+- The only undefined values in `label_diagnostic.csv` are 6 post-injection fields for `F3M`, where the denominator is zero; there are no NaN scores.
+
+Problems or warnings:
+- The placeholder is saturated on fault files: every fault window in the 13 files with post-injection data is above the healthy threshold. The binary shares are therefore all 100%, and the median-score ratios are the only timing evidence in this table.
+- The pre-injection anomaly may be a run-level offset rather than an early fault. The placeholder is a global window-mean model fitted to one healthy recording per mode, so differences in irradiance, temperature, or operating point between recordings can dominate it. No causal claim is made.
+- The window-mean covariance is nearly singular (condition numbers 7.00e+06-7.68e+06); a relative ridge (1.81e-07-2.27e-07) and a pseudo-inverse were required. Very large scores (up to 10,822.0) come from near-null directions and should not be read as physical units.
+- `F3M` ends before the 7-8 s window: its last window ends at 6.988 s, so it has no post-injection or 7-8 s data. Its score rise near the file end may include the zero-phase decimation edge transient.
+- The healthy training windows include the startup transient, so the fitted covariance already contains the `F0` startup behavior. This can make the placeholder less sensitive to a similar transient in fault files.
+- Windows overlap by 90%, so they are not independent observations; this diagnostic is descriptive and has no confidence intervals.
+- This is a diagnostic placeholder, not the final model. No detector setting was tuned on fault results; the score, ridge, and threshold rules were fixed before fault scoring.
+
+Decision needed from me: Yes - choose the label convention for the final evaluation. The diagnostic supports neither a blanket whole-file label nor a blanket time-resolved label: every fault file is already anomalous before 7 s, but only some files change at 7-8 s. Options: (1) keep whole-file labels as the primary comparison with the notebook and reference paper, and report time-resolved pre/post scores as a secondary analysis; or (2) make time-resolved labels primary, score pre-injection windows as false alarms, drop the 7-8 s overlap windows, and report `F3M` separately. Whichever is chosen, `F3M` must be reported as having no post-injection data.
+
+Next phase: Phase 3 - train the healthy-only detector and evaluate it under the chosen label convention, keeping fault data out of every modeling decision.
