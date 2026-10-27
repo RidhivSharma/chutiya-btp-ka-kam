@@ -19,6 +19,8 @@ STEPS = [
     ("Phase 2 - preprocessing and healthy split", PROJECT_ROOT / "src" / "data.py"),
     ("Phase 2 - preprocessing sanity checks", PROJECT_ROOT / "src" / "sanity_checks.py"),
     ("Phase 2 - labeling and timing diagnostic", PROJECT_ROOT / "src" / "time_diagnostic.py"),
+    ("Phase 3 - baseline models", PROJECT_ROOT / "src" / "baselines.py"),
+    ("Phase 3 - summary report", PROJECT_ROOT / "src" / "phase3_summary.py"),
 ]
 
 

@@ -47,6 +47,28 @@ validation data may be used for legitimate healthy-only model selection
 
 Evaluation labels may be used for scoring only, never as detector inputs.
 
+## 2a. Frozen phases and evaluation label convention (decided 2026-10-27)
+
+Phase 1 and Phase 2 are frozen. Their code, preprocessing choices, and saved
+outputs are not changed by later phases; later work builds on them.
+
+The final evaluation has two label views, in this order:
+
+- **Primary: `whole_file`.** Every window of every fault file `F1`...`F7` is
+  labelled faulty (1), and every healthy `F0` window is labelled healthy (0).
+  This matches the reference paper's Fig. 4 labelling and the original
+  notebook, and is the headline comparison.
+- **Secondary: `time_resolved`.** `-1` before 7 s, `-2` for windows overlapping
+  7-8 s (dropped), `1` after 8 s. The secondary analysis is a within-run change
+  test: pre-injection windows (end < 7 s, excluding the first 0.5 s) versus
+  post-8 s windows of the *same* fault file. It is not a pooled
+  healthy-versus-fault classifier metric.
+- `F3M` has no post-injection data because it ends before 7 s. It is always
+  reported as such and is never included in the post-injection change test.
+
+Fault files remain evaluation-only. Neither label view may be used for
+training, fitting, threshold selection, or model selection.
+
 ## 3. No hard-coded result numbers
 
 - Every number that appears in a table, figure, or claim must be computed by

@@ -163,3 +163,18 @@ because of the gaps. No model or fault evaluation exists yet.
 - Post-injection flag shares are 1.0000 to 1.0000 where post data exist, so the binary flag does not localize the onset; `F3M` has 0 post-injection windows.
 
 **Open issues/risks.** The placeholder is saturated on fault files, so pre-injection anomaly cannot be separated from a run-level operating-point offset. `F3M` ends before 7 s and has no post-injection data. The label convention for final evaluation (whole-file versus time-resolved) is still a decision.
+
+---
+## 2026-10-27 - Phase 3: baselines on the same pipeline
+
+**What was done.** Re-implemented EllipticEnvelope, IsolationForest, LocalOutlierFactor, and OneClassSVM on the frozen Phase 2 rows, and added the Phase 2 Mahalanobis placeholder unchanged as a fifth reference. Each model was fitted only on healthy training rows of one mode; the threshold is the 99th percentile of healthy validation window scores. Saved 10 score archives (5 models x 2 modes) in the five-key Phase 5 format plus a sanity table. No final metrics were computed.
+
+**Files created/changed.** `AGENTS.md` (label convention), `src/baselines.py`, `src/phase3_summary.py`, `run_all.py`, `results/scores_baseline_*.npz`, `results/baseline_sanity.csv`, `results/baselines_metadata.json`, `results/phase3_summary_stats.json`, `results/summary.md`, `STATUS.md`.
+
+**Key numbers (computed by code).**
+- 10 archives, 107,240 window scores; 13/13 checks passed.
+- Whole-file saturation: LocalOutlierFactor, Mahalanobis (window-mean) flag at least 95% of every fault file; EllipticEnvelope does so in 13/14.
+- Healthy test false-alarm rates (IPPT/MPPT): EllipticEnvelope IPPT 0.0187; EllipticEnvelope MPPT 0.0192; IsolationForest IPPT 0.0000; IsolationForest MPPT 0.0115; LocalOutlierFactor IPPT 0.1311; LocalOutlierFactor MPPT 0.2107; OneClassSVM IPPT 0.1086; OneClassSVM MPPT 0.2835; Mahalanobis (window-mean) IPPT 0.0075; Mahalanobis (window-mean) MPPT 0.0077.
+- Clear post-8 s rises (>=2.0x pre median) are unanimous for `F3L` and `F5L`; `F4L`, `F4M`, `F6L`, `F6M` and `F7M` have none. OneClassSVM MPPT is saturated at its score ceiling (93.79); LOF F1L has a negative pre median (-0.1278), so its ratio is undefined. F3M has no post-injection data.
+
+**Open issues/risks.** The whole-file view is saturated for `LocalOutlierFactor` and `Mahalanobis (window-mean)`, so it cannot separate methods. LOF and OneClassSVM have high healthy test false-alarm rates due to temporal drift within F0. OneClassSVM scores hit a ceiling, and LOF F1L has a negative pre median. F3M has no post-injection data. A reporting-only bug in the first draft (the saturated-model list compared per-mode counts with the 14-file total and printed `none`) was corrected before the final section was written; no model fit, score, threshold, or saved result changed.

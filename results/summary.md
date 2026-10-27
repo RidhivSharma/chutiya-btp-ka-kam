@@ -203,3 +203,88 @@ Problems or warnings:
 Decision needed from me: Yes - choose the label convention for the final evaluation. The diagnostic supports neither a blanket whole-file label nor a blanket time-resolved label: every fault file is already anomalous before 7 s, but only some files change at 7-8 s. Options: (1) keep whole-file labels as the primary comparison with the notebook and reference paper, and report time-resolved pre/post scores as a secondary analysis; or (2) make time-resolved labels primary, score pre-injection windows as false alarms, drop the 7-8 s overlap windows, and report `F3M` separately. Whichever is chosen, `F3M` must be reported as having no post-injection data.
 
 Next phase: Phase 3 - train the healthy-only detector and evaluate it under the chosen label convention, keeping fault data out of every modeling decision.
+
+## Phase 3: Baselines on the same pipeline   (2026-10-27 11:57 +0530)
+
+What was done: Phase 3 re-implemented the four reference baselines from the paper on the frozen Phase 2 pipeline: EllipticEnvelope, IsolationForest, LocalOutlierFactor, and OneClassSVM. Each scikit-learn model was fitted only on the standardized healthy training rows of one operating mode (8,650 rows for IPPT, 8,490 for MPPT; both are below the 20,000-row cap, so no subsampling was needed). The Phase 2 Mahalanobis placeholder was added unchanged as a fifth, window-mean reference. A window score is the mean of -decision_function over its 100 time steps (higher means more anomalous); the threshold is the 99th percentile of healthy validation window scores. No fault file and no healthy test window was used for a fit or a threshold. The new label convention is recorded in `AGENTS.md`: whole-file labels are primary, time-resolved pre/post-8 s comparisons are secondary, and `F3M` is always reported as having no post-injection data. 10 score archives (5 models x 2 modes) were saved in the same five-key format the proposed model will use, together with a sanity table. No final metrics were computed in this phase.
+
+Files created or changed:
+- `AGENTS.md` - recorded frozen Phases 1-2 and the primary whole-file / secondary time-resolved label decision.
+- `src/baselines.py` - fits the five baselines, scores every file, and saves the score archives and sanity table.
+- `src/phase3_summary.py` - reads the saved results and writes this section and the STATUS entry.
+- `run_all.py` - added the Phase 3 baseline and summary steps.
+- `results/scores_baseline_<model>_<mode>.npz` - 10 archives with keys `scores`, `start_time`, `end_time`, `threshold`, `name`.
+- `results/baseline_sanity.csv` - healthy validation/test flag rates, per-fault whole-file shares, and pre/post median scores.
+- `results/baselines_metadata.json` - model settings, training and scoring times, thresholds, checks, environment, git commit.
+- `results/phase3_summary_stats.json` - the facts used in this report.
+- `results/summary.md` - this Phase 3 section.
+- `STATUS.md` - appended Phase 3 log entry.
+
+Key numbers:
+
+### Training time and healthy false alarms
+
+| Model | Mode | Train units | Training time (s) | Threshold | Healthy validation flagged | Healthy test flagged (false-alarm rate) |
+|---|---|---|---|---|---|---|
+| EllipticEnvelope | IPPT | 8,650 | 0.899 | 2.76234 | 3/285 (1.05%) | 5/267 (1.87%) |
+| EllipticEnvelope | MPPT | 8,490 | 0.849 | 4.80809 | 3/280 (1.07%) | 5/261 (1.92%) |
+| IsolationForest | IPPT | 8,650 | 0.259 | 0.000577689 | 3/285 (1.05%) | 0/267 (0.00%) |
+| IsolationForest | MPPT | 8,490 | 0.141 | -0.00284774 | 3/280 (1.07%) | 3/261 (1.15%) |
+| LocalOutlierFactor | IPPT | 8,650 | 0.841 | -0.240832 | 3/285 (1.05%) | 35/267 (13.11%) |
+| LocalOutlierFactor | MPPT | 8,490 | 0.899 | -0.244838 | 3/280 (1.07%) | 55/261 (21.07%) |
+| OneClassSVM | IPPT | 8,650 | 0.581 | 0.304288 | 3/285 (1.05%) | 29/267 (10.86%) |
+| OneClassSVM | MPPT | 8,490 | 0.357 | -1.20806 | 3/280 (1.07%) | 74/261 (28.35%) |
+| Mahalanobis (window-mean) | IPPT | 856 | 0.010 | 5.30072 | 3/285 (1.05%) | 2/267 (0.75%) |
+| Mahalanobis (window-mean) | MPPT | 840 | 0.001 | 6.6192 | 3/280 (1.07%) | 2/261 (0.77%) |
+
+Training time is the measured `fit` call only; scoring time is reported in `baselines_metadata.json`. The threshold is the 99th percentile of healthy validation window scores. The healthy test block is later in time and was not used for the fit or the threshold.
+
+### Fault-file sanity and within-run change
+
+| Model | Mode | Fault files with >=95% flagged | Whole-file flag share range | Clear rise >=2.0x | Weak rise 1.2-2.0x | Flat or lower <1.2x | Special cases | No post-injection data |
+|---|---|---|---|---|---|---|---|---|
+| EllipticEnvelope | IPPT | 6/7: `F1L`, `F2L`, `F3L`, `F4L`, `F6L`, `F7L` | 85.71%-100.00% | `F1L`, `F2L`, `F3L`, `F5L` | `F6L` | `F4L`, `F7L` | none | none |
+| EllipticEnvelope | MPPT | 7/7 (all) | 100.00%-100.00% | `F1M`, `F2M`, `F5M` | none | `F4M`, `F6M`, `F7M` | none | `F3M` |
+| IsolationForest | IPPT | 4/7: `F1L`, `F2L`, `F4L`, `F7L` | 78.47%-100.00% | `F3L`, `F5L` | `F1L`, `F2L`, `F6L` | `F4L`, `F7L` | none | none |
+| IsolationForest | MPPT | 6/7: `F1M`, `F2M`, `F4M`, `F5M`, `F6M`, `F7M` | 47.83%-100.00% | `F1M`, `F2M`, `F5M` | none | `F4M`, `F6M`, `F7M` | none | `F3M` |
+| LocalOutlierFactor | IPPT | 7/7 (all) | 99.16%-100.00% | `F2L`, `F3L`, `F5L`, `F7L` | `F6L` | `F4L` | `F1L`: ratio undefined (pre median -0.1278 < 0; medians -0.1278 -> 0.4163) | none |
+| LocalOutlierFactor | MPPT | 7/7 (all) | 98.41%-100.00% | `F1M`, `F5M` | none | `F2M`, `F4M`, `F6M`, `F7M` | none | `F3M` |
+| OneClassSVM | IPPT | 4/7: `F1L`, `F2L`, `F4L`, `F7L` | 76.21%-100.00% | `F3L`, `F5L` | `F2L`, `F6L` | `F1L`, `F7L` | both medians at the score ceiling: `F4L` (85.79); post median at the score ceiling: `F3L`, `F5L` (85.79) | none |
+| OneClassSVM | MPPT | 6/7: `F1M`, `F2M`, `F4M`, `F5M`, `F6M`, `F7M` | 60.87%-100.00% | none | none | none | all 6 post-injection files: both medians at the score ceiling (93.79) | `F3M` |
+| Mahalanobis (window-mean) | IPPT | 7/7 (all) | 100.00%-100.00% | `F1L`, `F2L`, `F3L`, `F5L` | none | `F4L`, `F6L`, `F7L` | none | none |
+| Mahalanobis (window-mean) | MPPT | 7/7 (all) | 100.00%-100.00% | `F1M`, `F5M` | `F2M` | `F4M`, `F6M`, `F7M` | none | `F3M` |
+
+Whole-file flag share is the fraction of all windows in that fault file above the healthy-validation threshold. The rise columns compare the median score of pre-injection windows (end < 7 s, excluding the first 0.5 s) with windows starting after 8 s in the same file. `Clear`, `weak`, and `flat` use the 2.0x and 1.2x conventions stated at the top of this section. `NA` means the denominator or ratio is undefined, not zero.
+
+### Plain answers
+
+- (a) Almost everything: at the 95% per-file threshold, EllipticEnvelope flags 13/14 (lowest `F5L` at 85.71%); IsolationForest flags 10/14 (lowest `F3M` at 47.83%); LocalOutlierFactor flags all 14 fault files; OneClassSVM flags 10/14 (lowest `F3M` at 60.87%); Mahalanobis (window-mean) flags all 14 fault files. The fully saturated references are `LocalOutlierFactor` and `Mahalanobis (window-mean)`, so the whole-file view cannot separate them from a trivial detector. Exact per-file shares are in `baseline_sanity.csv`.
+- (b) Post-8 s score rise: the table lists every file. A clear rise (>= 2.0x the same file's pre-injection median) is unanimous across all models with post data for `F3L` and `F5L`. No model shows a clear rise for `F4L`, `F4M`, `F6L`, `F6M` and `F7M`. `F3M` has no post-injection data in every run and is excluded from every rise comparison. `OneClassSVM` in MPPT is saturated: both medians sit at the score ceiling (93.79) in 6 of 6 post-injection files, so its ratios (1.00x) are not evidence of no change. `LOF` `F1L` has a negative pre-injection median, so its ratio is undefined even though its median rises from -0.1278 to 0.4163.
+- (c) Healthy test false-alarm rates: EllipticEnvelope IPPT 1.87% (5/267); EllipticEnvelope MPPT 1.92% (5/261); IsolationForest IPPT 0.00% (0/267); IsolationForest MPPT 1.15% (3/261); LocalOutlierFactor IPPT 13.11% (35/267); LocalOutlierFactor MPPT 21.07% (55/261); OneClassSVM IPPT 10.86% (29/267); OneClassSVM MPPT 28.35% (74/261); Mahalanobis (window-mean) IPPT 0.75% (2/267); Mahalanobis (window-mean) MPPT 0.77% (2/261). LOF and OneClassSVM are far above their validation rates, so their validation thresholds do not transfer to the later healthy test block; the other three stay much closer to their validation rates.
+
+Checks passed:
+- The baseline run reports 13/13 checks passed.
+- All 10 archives contain exactly the five Phase 5 keys and 107,240 window scores; every model scored 21,448 windows (healthy train/val/test plus seven fault files).
+- All scores, window times, and thresholds are finite; there are no NaN or infinite values.
+- Every threshold equals the 99th percentile of healthy validation window scores recomputed from the saved archive; no test or fault window was used.
+- The Mahalanobis reference reproduces the Phase 2 threshold and all of its window scores exactly.
+- Every flag rate in `baseline_sanity.csv` equals flagged/windows, and the healthy validation flag rate is at most 2% for every model and mode.
+- `F3M` is marked as having zero post-injection windows in all 5 model rows; its post median is `NA`, not a fabricated value.
+- The cached-row scoring shortcut was checked against direct window scoring on sample windows for every model, mode, and file; all agree within numerical tolerance.
+- The frozen Phase 2 sanity checks still report 30/30 passed.
+
+Problems or warnings:
+- The whole-file view is saturated. `LocalOutlierFactor` and `Mahalanobis (window-mean)` flag at least 95% of the windows in all 14 fault files, and EllipticEnvelope does so in 13/14. A near-perfect whole-file score therefore does not show that a detector is better than a trivial one; the secondary pre/post-8 s analysis is the discriminating view.
+- LOF and OneClassSVM have high healthy test false-alarm rates (13.11%/21.07% for LOF and 10.86%/28.35% for OneClassSVM, IPPT/MPPT) even though their validation rates are 1.05%/1.07% and 1.05%/1.07%. The healthy recording changes over time, so a threshold fitted on the middle validation block does not transfer to the later test block.
+- OneClassSVM scores saturate at a ceiling (85.79 IPPT, 93.79 MPPT). In saturated files both pre- and post-8 s medians equal the ceiling, so a ratio of 1x means the score cannot rise further, not that the fault has no effect.
+- LOF `F1L` has a negative pre-injection median (-0.1278), so its post/pre ratio is undefined. The medians themselves rise to 0.4163; the ratio is reported as `NA` rather than forced.
+- The baselines are fitted to one healthy recording per mode. Differences in irradiance, temperature, or operating point between recordings can dominate the scores, so the pre-injection anomaly is not proof that a fault was already active.
+- The healthy training rows include the startup transient, because the frozen Phase 2 pipeline keeps it. The baselines therefore learn that transient as normal.
+- Windows overlap by 90%, so window-level observations are not independent; the sanity table is descriptive and has no confidence intervals.
+- The phase specification fixes `random_state=0` for EllipticEnvelope and IsolationForest; LOF, OneClassSVM, and Mahalanobis are deterministic. No 0/1/2 seed sweep was run, because the baseline settings are frozen and no fault data are used for any choice.
+- The scikit-learn baselines were fitted on the unique 1 kHz rows covered by the training windows, not on the flattened 90%-overlapping windows. This avoids counting each time step ten times and matches the rows used to fit the Phase 2 scaler.
+- EllipticEnvelope produces very large scores (up to 2.883e+06) from near-singular covariance directions; these are not physical units and should not be compared across models.
+
+Decision needed from me: No. The label convention is fixed in `AGENTS.md` (whole-file primary, time-resolved secondary, `F3M` always reported as having no post-injection data), so Phase 4 can proceed. The 95% and 2.0x/1.2x cut-offs used above are descriptive reporting conventions only, not detector settings.
+
+Next phase: Phase 4 - train the proposed healthy-only autoencoder on the same frozen windows and save its scores in the same five-key npz format.

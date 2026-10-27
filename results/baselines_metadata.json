@@ -1,0 +1,377 @@
+{
+  "phase": "phase_3_baselines",
+  "generated_utc": "2026-10-27T06:07:36.854363+00:00",
+  "git_commit": "8321251ef566dcd0bccc8ba42978abfc9b03584a",
+  "environment": {
+    "python": "3.13.1",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "numpy": "2.2.3",
+    "pandas": "2.2.3",
+    "scipy": "1.15.2",
+    "scikit-learn": "1.6.1"
+  },
+  "seed": 0,
+  "seed_note": "The phase specification fixes random_state=0 for the two stochastic baselines (EllipticEnvelope and IsolationForest); LOF, OneClassSVM, and the Mahalanobis placeholder are deterministic. No multi-seed sweep is performed because the baseline settings are frozen and no fault data are used.",
+  "label_convention": {
+    "primary": "whole_file",
+    "secondary": "time_resolved",
+    "f3m": "no post-injection data; always reported as such",
+    "source": "AGENTS.md section 2a (decided 2026-10-27)"
+  },
+  "training_data": "unique standardized 1 kHz rows covered by the healthy training windows of the same mode (F0L for IPPT, F0M for MPPT)",
+  "subsample_cap": 20000,
+  "threshold_rule": "99th percentile of window scores on healthy validation windows",
+  "threshold_quantile": 0.99,
+  "flag_rule": "score > threshold",
+  "window_score_rule": "mean of -decision_function over the 100 time steps in a window; the Mahalanobis reference uses its Phase 2 window-mean distance",
+  "models": {
+    "elliptic_envelope": {
+      "label": "EllipticEnvelope",
+      "input": "time_step_rows",
+      "params": {
+        "support_fraction": 0.999,
+        "contamination": 0.1,
+        "assume_centered": false,
+        "random_state": 0
+      }
+    },
+    "isolation_forest": {
+      "label": "IsolationForest",
+      "input": "time_step_rows",
+      "params": {
+        "n_estimators": 100,
+        "random_state": 0
+      }
+    },
+    "lof": {
+      "label": "LocalOutlierFactor",
+      "input": "time_step_rows",
+      "params": {
+        "n_neighbors": 20,
+        "novelty": true
+      }
+    },
+    "one_class_svm": {
+      "label": "OneClassSVM",
+      "input": "time_step_rows",
+      "params": {
+        "kernel": "rbf",
+        "gamma": "scale",
+        "nu": 0.1
+      }
+    },
+    "mahalanobis_window_mean": {
+      "label": "Mahalanobis (window-mean)",
+      "input": "window_means",
+      "params": {
+        "covariance_ddof": 1,
+        "ridge_relative": 1e-06,
+        "pseudo_inverse": "numpy.linalg.pinv(..., hermitian=True)",
+        "source": "src/time_diagnostic.py fit_placeholder/score_means"
+      }
+    }
+  },
+  "runs": [
+    {
+      "model": "elliptic_envelope",
+      "model_label": "EllipticEnvelope",
+      "mode": "IPPT",
+      "mode_suffix": "L",
+      "healthy_file": "F0L",
+      "input_kind": "time_step_rows",
+      "train_units": 8650,
+      "subsample_applied": false,
+      "training_time_s": 0.8991546999895945,
+      "scoring_time_s": 0.05975360004231334,
+      "threshold": 2.762336531415599,
+      "windows": 10841,
+      "score_min": -28.048472648076714,
+      "score_max": 2883129.9515909576,
+      "score_nan": 0,
+      "npz_path": "results\\scores_baseline_elliptic_envelope_IPPT.npz",
+      "model_params": {
+        "support_fraction": 0.999,
+        "contamination": 0.1,
+        "assume_centered": false,
+        "random_state": 0
+      }
+    },
+    {
+      "model": "elliptic_envelope",
+      "model_label": "EllipticEnvelope",
+      "mode": "MPPT",
+      "mode_suffix": "M",
+      "healthy_file": "F0M",
+      "input_kind": "time_step_rows",
+      "train_units": 8490,
+      "subsample_applied": false,
+      "training_time_s": 0.8488568000029773,
+      "scoring_time_s": 0.03595589997712523,
+      "threshold": 4.808086980335409,
+      "windows": 10607,
+      "score_min": -18.978054520227015,
+      "score_max": 2783672.212085109,
+      "score_nan": 0,
+      "npz_path": "results\\scores_baseline_elliptic_envelope_MPPT.npz",
+      "model_params": {
+        "support_fraction": 0.999,
+        "contamination": 0.1,
+        "assume_centered": false,
+        "random_state": 0
+      }
+    },
+    {
+      "model": "isolation_forest",
+      "model_label": "IsolationForest",
+      "mode": "IPPT",
+      "mode_suffix": "L",
+      "healthy_file": "F0L",
+      "input_kind": "time_step_rows",
+      "train_units": 8650,
+      "subsample_applied": false,
+      "training_time_s": 0.2594850999303162,
+      "scoring_time_s": 0.5745722000719979,
+      "threshold": 0.000577688985659059,
+      "windows": 10841,
+      "score_min": -0.06258653423167175,
+      "score_max": 0.13958110845225605,
+      "score_nan": 0,
+      "npz_path": "results\\scores_baseline_isolation_forest_IPPT.npz",
+      "model_params": {
+        "n_estimators": 100,
+        "random_state": 0
+      }
+    },
+    {
+      "model": "isolation_forest",
+      "model_label": "IsolationForest",
+      "mode": "MPPT",
+      "mode_suffix": "M",
+      "healthy_file": "F0M",
+      "input_kind": "time_step_rows",
+      "train_units": 8490,
+      "subsample_applied": false,
+      "training_time_s": 0.14074359997175634,
+      "scoring_time_s": 0.5105309999780729,
+      "threshold": -0.002847736746378217,
+      "windows": 10607,
+      "score_min": -0.05670763445710179,
+      "score_max": 0.14891298058528393,
+      "score_nan": 0,
+      "npz_path": "results\\scores_baseline_isolation_forest_MPPT.npz",
+      "model_params": {
+        "n_estimators": 100,
+        "random_state": 0
+      }
+    },
+    {
+      "model": "lof",
+      "model_label": "LocalOutlierFactor",
+      "mode": "IPPT",
+      "mode_suffix": "L",
+      "healthy_file": "F0L",
+      "input_kind": "time_step_rows",
+      "train_units": 8650,
+      "subsample_applied": false,
+      "training_time_s": 0.8413712999317795,
+      "scoring_time_s": 8.542673700023443,
+      "threshold": -0.24083182244300833,
+      "windows": 10841,
+      "score_min": -0.5190922445058823,
+      "score_max": 413.57320587158205,
+      "score_nan": 0,
+      "npz_path": "results\\scores_baseline_lof_IPPT.npz",
+      "model_params": {
+        "n_neighbors": 20,
+        "novelty": true
+      }
+    },
+    {
+      "model": "lof",
+      "model_label": "LocalOutlierFactor",
+      "mode": "MPPT",
+      "mode_suffix": "M",
+      "healthy_file": "F0M",
+      "input_kind": "time_step_rows",
+      "train_units": 8490,
+      "subsample_applied": false,
+      "training_time_s": 0.8994649000233039,
+      "scoring_time_s": 4.661714900052175,
+      "threshold": -0.24483787235021598,
+      "windows": 10607,
+      "score_min": -0.5144707888364792,
+      "score_max": 308.88970703125,
+      "score_nan": 0,
+      "npz_path": "results\\scores_baseline_lof_MPPT.npz",
+      "model_params": {
+        "n_neighbors": 20,
+        "novelty": true
+      }
+    },
+    {
+      "model": "one_class_svm",
+      "model_label": "OneClassSVM",
+      "mode": "IPPT",
+      "mode_suffix": "L",
+      "healthy_file": "F0L",
+      "input_kind": "time_step_rows",
+      "train_units": 8650,
+      "subsample_applied": false,
+      "training_time_s": 0.5808608999941498,
+      "scoring_time_s": 9.385423100087792,
+      "threshold": 0.30428780311070647,
+      "windows": 10841,
+      "score_min": -36.36111626878534,
+      "score_max": 85.78910494304728,
+      "score_nan": 0,
+      "npz_path": "results\\scores_baseline_one_class_svm_IPPT.npz",
+      "model_params": {
+        "kernel": "rbf",
+        "gamma": "scale",
+        "nu": 0.1
+      }
+    },
+    {
+      "model": "one_class_svm",
+      "model_label": "OneClassSVM",
+      "mode": "MPPT",
+      "mode_suffix": "M",
+      "healthy_file": "F0M",
+      "input_kind": "time_step_rows",
+      "train_units": 8490,
+      "subsample_applied": false,
+      "training_time_s": 0.35741180006880313,
+      "scoring_time_s": 7.927988099982031,
+      "threshold": -1.2080618538594021,
+      "windows": 10607,
+      "score_min": -33.65142817513317,
+      "score_max": 93.78836762561696,
+      "score_nan": 0,
+      "npz_path": "results\\scores_baseline_one_class_svm_MPPT.npz",
+      "model_params": {
+        "kernel": "rbf",
+        "gamma": "scale",
+        "nu": 0.1
+      }
+    },
+    {
+      "model": "mahalanobis_window_mean",
+      "model_label": "Mahalanobis (window-mean)",
+      "mode": "IPPT",
+      "mode_suffix": "L",
+      "healthy_file": "F0L",
+      "input_kind": "window_means",
+      "train_units": 856,
+      "subsample_applied": false,
+      "training_time_s": 0.010257399990223348,
+      "scoring_time_s": 0.040038299979642034,
+      "threshold": 5.300718950653503,
+      "windows": 10841,
+      "score_min": 1.3449395844028362,
+      "score_max": 10821.962367819513,
+      "score_nan": 0,
+      "npz_path": "results\\scores_baseline_mahalanobis_window_mean_IPPT.npz",
+      "model_params": {
+        "covariance_ddof": 1,
+        "ridge_relative": 1e-06,
+        "pseudo_inverse": "numpy.linalg.pinv(..., hermitian=True)",
+        "source": "src/time_diagnostic.py fit_placeholder/score_means"
+      }
+    },
+    {
+      "model": "mahalanobis_window_mean",
+      "model_label": "Mahalanobis (window-mean)",
+      "mode": "MPPT",
+      "mode_suffix": "M",
+      "healthy_file": "F0M",
+      "input_kind": "window_means",
+      "train_units": 840,
+      "subsample_applied": false,
+      "training_time_s": 0.0005826998967677355,
+      "scoring_time_s": 0.03672580001875758,
+      "threshold": 6.6192048940610295,
+      "windows": 10607,
+      "score_min": 1.6582994628625656,
+      "score_max": 8124.174469910917,
+      "score_nan": 0,
+      "npz_path": "results\\scores_baseline_mahalanobis_window_mean_MPPT.npz",
+      "model_params": {
+        "covariance_ddof": 1,
+        "ridge_relative": 1e-06,
+        "pseudo_inverse": "numpy.linalg.pinv(..., hermitian=True)",
+        "source": "src/time_diagnostic.py fit_placeholder/score_means"
+      }
+    }
+  ],
+  "sanity_csv": "results\\baseline_sanity.csv",
+  "sanity_rows": 90,
+  "checks_passed": 13,
+  "checks_total": 13,
+  "checks": [
+    {
+      "name": "cached scaled rows match IPPT windows",
+      "passed": true,
+      "detail": "first, middle, and last window of every file"
+    },
+    {
+      "name": "cached scaled rows match MPPT windows",
+      "passed": true,
+      "detail": "first, middle, and last window of every file"
+    },
+    {
+      "name": "every archive has exactly the five Phase 5 keys",
+      "passed": true,
+      "detail": "keys = scores, start_time, end_time, threshold, name"
+    },
+    {
+      "name": "score/time/name arrays have identical lengths",
+      "passed": true,
+      "detail": "10 archives checked"
+    },
+    {
+      "name": "all scores, times, and thresholds are finite",
+      "passed": true,
+      "detail": "107,240 window scores across 10 archives"
+    },
+    {
+      "name": "every group has the expected window count",
+      "passed": true,
+      "detail": "healthy train/val/test and seven fault files per mode"
+    },
+    {
+      "name": "every threshold equals the healthy-validation p99 recomputed from disk",
+      "passed": true,
+      "detail": "threshold uses no test or fault window"
+    },
+    {
+      "name": "Mahalanobis reference reuses the Phase 2 threshold unchanged",
+      "passed": true,
+      "detail": "IPPT: threshold 5.30072 vs Phase 2 5.30072; MPPT: threshold 6.6192 vs Phase 2 6.6192"
+    },
+    {
+      "name": "Mahalanobis reference reuses the Phase 2 window scores unchanged",
+      "passed": true,
+      "detail": "all 21,448 scored windows match time_diagnostic_scores.csv"
+    },
+    {
+      "name": "sanity table has 5 models x 2 modes x 9 groups",
+      "passed": true,
+      "detail": "90 rows, expected 90"
+    },
+    {
+      "name": "every flag rate equals flagged/windows",
+      "passed": true,
+      "detail": "healthy and fault rows"
+    },
+    {
+      "name": "F3M is marked as having no post-injection data",
+      "passed": true,
+      "detail": "5 model/mode rows; post windows = 0"
+    },
+    {
+      "name": "healthy validation flag rate is at most 2%",
+      "passed": true,
+      "detail": "IPPT/EllipticEnvelope=0.0105, MPPT/EllipticEnvelope=0.0107, IPPT/IsolationForest=0.0105, MPPT/IsolationForest=0.0107, IPPT/LocalOutlierFactor=0.0105, MPPT/LocalOutlierFactor=0.0107, IPPT/OneClassSVM=0.0105, MPPT/OneClassSVM=0.0107, IPPT/Mahalanobis (window-mean)=0.0105, MPPT/Mahalanobis (window-mean)=0.0107"
+    }
+  ]
+}
