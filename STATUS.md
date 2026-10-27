@@ -210,3 +210,21 @@ because of the gaps. No model or fault evaluation exists yet.
 - `F3M` has 0 post-injection windows and is excluded from the within-run table; `F3L` has post-injection data and is included.
 
 **Open issues/risks.** The whole-file AUC is close to saturation for most models, while F1 and accuracy separate the models more; overlapping windows make the bootstrap intervals optimistic. Proposed (featnorm) has high healthy-test false-alarm rates. The reference-paper table uses a different protocol (single 10 kHz samples) and is reference only. F3M ends before 7 s. No model was retuned in response to any fault result.
+
+<!-- PHASE6_STATUS_START -->
+---
+## 2026-10-28 - Phase 6: figures and tables
+
+**What was done.** Generated 9 300 dpi figures and the T1-T8 tables from the frozen Phase 1-5 result files, then verified every table value against its source. Added the paper-framing rules to `AGENTS.md` and the Phase 6 steps to `run_all.py`. No model was retrained and no score, threshold, k=3 or normalization was changed.
+
+**Files created/changed.** `src/make_figures.py`, `src/verify_phase6.py`, `src/phase6_summary.py`, `figures/paper/fig_*.png` (9), `results/tables.md`, `results/figure_captions.md`, `results/phase6_table_values.json`, `results/phase6_architecture.json`, `results/phase6_verification.json`, `results/summary.md`, `STATUS.md`, `AGENTS.md`, `run_all.py`.
+
+**Key numbers (computed by `src/make_figures.py` and `src/verify_phase6.py`).**
+- 9/9 figures; 943 table values checked with 0 mismatches; 0 superiority claims.
+- Proposed (plain) primary F1 0.9869 IPPT and 0.9891 MPPT; healthy-test FAR 0.00% and 2.17%.
+- Proposed (featnorm) primary F1 0.9472 IPPT and 0.8758 MPPT; healthy-test FAR 11.24% and 28.74%.
+- Mahalanobis (window-mean) primary F1 0.9962 IPPT and 0.9963 MPPT; healthy-test FAR 0.75% and 0.77%.
+- Within-run AUC: Proposed (plain) 0.7507 IPPT and 0.7606 MPPT; Proposed (featnorm) 0.7676 and 0.7420.
+
+**Open issues/risks.** Proposed (featnorm) is a negative result with high healthy-test false-alarm rates. Neither proposed variant exceeds the trivial Mahalanobis baseline on primary average F1, so the paper must not claim superiority. The whole-file view is partly saturated, windows overlap heavily, and the reference paper uses a different protocol. Noise-robustness and ablation phases are skipped.
+<!-- PHASE6_STATUS_END -->

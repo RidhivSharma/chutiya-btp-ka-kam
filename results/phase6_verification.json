@@ -1,0 +1,133 @@
+{
+  "phase": "phase_6_figures_and_tables",
+  "figures": {
+    "expected": 9,
+    "found": 9,
+    "details": [
+      {
+        "file": "fig_healthy_far.png",
+        "exists": true,
+        "bytes": 247709,
+        "width": 2854,
+        "height": 1474,
+        "format": "PNG",
+        "dpi": [
+          299.9994,
+          299.9994
+        ]
+      },
+      {
+        "file": "fig_primary_f1_auc.png",
+        "exists": true,
+        "bytes": 120340,
+        "width": 3514,
+        "height": 1583,
+        "format": "PNG",
+        "dpi": [
+          299.9994,
+          299.9994
+        ]
+      },
+      {
+        "file": "fig_within_run_auc.png",
+        "exists": true,
+        "bytes": 122387,
+        "width": 3514,
+        "height": 1583,
+        "format": "PNG",
+        "dpi": [
+          299.9994,
+          299.9994
+        ]
+      },
+      {
+        "file": "fig_score_vs_time.png",
+        "exists": true,
+        "bytes": 402358,
+        "width": 2914,
+        "height": 2194,
+        "format": "PNG",
+        "dpi": [
+          299.9994,
+          299.9994
+        ]
+      },
+      {
+        "file": "fig_score_hist.png",
+        "exists": true,
+        "bytes": 131306,
+        "width": 3514,
+        "height": 1474,
+        "format": "PNG",
+        "dpi": [
+          299.9994,
+          299.9994
+        ]
+      },
+      {
+        "file": "fig_threshold_sensitivity.png",
+        "exists": true,
+        "bytes": 231355,
+        "width": 3334,
+        "height": 1474,
+        "format": "PNG",
+        "dpi": [
+          299.9994,
+          299.9994
+        ]
+      },
+      {
+        "file": "fig_training_curves.png",
+        "exists": true,
+        "bytes": 305807,
+        "width": 3574,
+        "height": 1894,
+        "format": "PNG",
+        "dpi": [
+          299.9994,
+          299.9994
+        ]
+      },
+      {
+        "file": "fig_feature_error_heatmap.png",
+        "exists": true,
+        "bytes": 142067,
+        "width": 4233,
+        "height": 1594,
+        "format": "PNG",
+        "dpi": [
+          299.9994,
+          299.9994
+        ]
+      },
+      {
+        "file": "fig_architecture.png",
+        "exists": true,
+        "bytes": 205886,
+        "width": 1942,
+        "height": 2694,
+        "format": "PNG",
+        "dpi": [
+          299.9994,
+          299.9994
+        ]
+      }
+    ],
+    "problems": []
+  },
+  "tables": {
+    "values_checked": 943,
+    "mismatches": [],
+    "placement_failures": [],
+    "missing_table_sections": []
+  },
+  "captions": {
+    "expected": 9,
+    "found": 9,
+    "missing": [],
+    "extra": [],
+    "problems": []
+  },
+  "superiority_claims": [],
+  "passed": true
+}

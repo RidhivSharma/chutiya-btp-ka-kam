@@ -1,0 +1,36 @@
+{
+  "source": "src/model.py",
+  "note": "Static architecture summary copied from src/model.py; not a result value.",
+  "input_timesteps": 100,
+  "input_features": 13,
+  "encoder_tcn_filters": [
+    32,
+    32,
+    64
+  ],
+  "encoder_tcn_dilations": [
+    1,
+    2,
+    4
+  ],
+  "kernel_size": 3,
+  "dropout_rate": 0.1,
+  "encoder_bilstm_units_per_direction": 64,
+  "latent_bilstm_units_per_direction": 32,
+  "repeat_timesteps": 100,
+  "decoder_bilstm_units_per_direction": [
+    32,
+    64
+  ],
+  "decoder_tcn_filters": [
+    64,
+    32
+  ],
+  "decoder_tcn_dilations": [
+    4,
+    2
+  ],
+  "output_dense_units": 13,
+  "batch_normalization": true,
+  "residual_connections": true
+}

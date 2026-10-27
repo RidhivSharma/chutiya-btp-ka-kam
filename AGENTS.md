@@ -182,3 +182,22 @@ At the end of every phase:
 - Primary whole-file results and secondary within-run results are reported as
   separate views; a model is never ranked on fault performance alone without
   its healthy-test false-alarm rate.
+
+## 13. Paper framing and scope (decided 2026-10-28, Phase 6)
+
+- The paper is a **leak-free re-evaluation** of semi-supervised PV fault
+  detection on GPVS-Faults. It is not a claim of a new state-of-the-art method.
+- It must **not** claim that the proposed model outperforms the baselines.
+  Phase 5 found that neither proposed variant beats the trivial
+  Mahalanobis (window-mean) baseline on the primary whole-file comparison
+  (average F1, accuracy, AUC, TPR or FPR). The paper reports this null result
+  plainly.
+- `Proposed (featnorm)` is reported as a **negative result**. Its healthy-test
+  false-alarm rate is 11.24% in IPPT and 28.74% in MPPT at the frozen
+  99th-percentile threshold, so its fault sensitivity does not make it a
+  deployable detector.
+- The noise-robustness and ablation phases are **skipped**. Phase 6 (figures
+  and tables) is the final phase.
+- Wording: use descriptive verbs ("reaches", "reports", "does not exceed").
+  Do not use "outperforms", "superior", "state of the art", "wins", or
+  "best model" for the proposed method relative to any baseline.

@@ -25,6 +25,9 @@ STEPS = [
     ("Phase 4 - summary report", PROJECT_ROOT / "src" / "phase4_summary.py"),
     ("Phase 5 - final evaluation from score archives", PROJECT_ROOT / "src" / "phase5_eval.py"),
     ("Phase 5 - summary report", PROJECT_ROOT / "src" / "phase5_summary.py"),
+    ("Phase 6 - figures, tables and audit trail", PROJECT_ROOT / "src" / "make_figures.py"),
+    ("Phase 6 - verify figures and tables", PROJECT_ROOT / "src" / "verify_phase6.py"),
+    ("Phase 6 - summary report", PROJECT_ROOT / "src" / "phase6_summary.py"),
 ]
 
 
