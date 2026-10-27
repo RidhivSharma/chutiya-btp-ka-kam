@@ -1,0 +1,152 @@
+{
+  "phase": "phase_5_final_evaluation",
+  "generated_utc": "2026-10-27T19:39:57.719154+00:00",
+  "git_commit": "b4328e8a2394f06ce3192a7b7d7f598fc23a824a",
+  "environment": {
+    "python": "3.13.1",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "numpy": "2.2.3",
+    "pandas": "2.2.3",
+    "scipy": "1.15.2",
+    "scikit-learn": "1.6.1"
+  },
+  "inputs": {
+    "description": "saved score archives only; no model, raw data or fault score recomputation",
+    "archives": [
+      {
+        "path": "results/scores_proposed_plain_IPPT_seed0.npz",
+        "sha256": "e438fe6465335623c823692949962bf75cb5acc3ef5707b09266c6b717dc95cc"
+      },
+      {
+        "path": "results/scores_proposed_plain_IPPT_seed1.npz",
+        "sha256": "029c49f0ed3660e4560e7d35536e3cadd5fc4e67b39491377f1112538c565862"
+      },
+      {
+        "path": "results/scores_proposed_plain_IPPT_seed2.npz",
+        "sha256": "8909ac8ff5c71fd13d2e75f49f8cb2c4156a5f5635183631e8f943fbee98a628"
+      },
+      {
+        "path": "results/scores_proposed_plain_MPPT_seed0.npz",
+        "sha256": "4466eeb7ba2d747ec24c4f168ad186242f6514c8a8ae5aec02aa7bec855465c7"
+      },
+      {
+        "path": "results/scores_proposed_plain_MPPT_seed1.npz",
+        "sha256": "91e14c465a9a2cbc8e1ad4787dda409f5a4b7131bd184ad8c66d5bb2f373f254"
+      },
+      {
+        "path": "results/scores_proposed_plain_MPPT_seed2.npz",
+        "sha256": "88e68662008c2141ae5620aa0fcbd16f1eab0f729ff422486abf21d917476a95"
+      },
+      {
+        "path": "results/scores_proposed_featnorm_IPPT_seed0.npz",
+        "sha256": "de51a13f5e0555375bdb51fc9f4cac4070a9fdb9e359519228aa56580417e569"
+      },
+      {
+        "path": "results/scores_proposed_featnorm_IPPT_seed1.npz",
+        "sha256": "aa4b9e461eeed3492da813d3e0b8ba4d52f6ceb9852a22d81caa86a774ed1534"
+      },
+      {
+        "path": "results/scores_proposed_featnorm_IPPT_seed2.npz",
+        "sha256": "75e95e21ce7862b644deb965eb05f9b690687c2190360b83aa6a981f58db9cc3"
+      },
+      {
+        "path": "results/scores_proposed_featnorm_MPPT_seed0.npz",
+        "sha256": "cf0b708f81ae56c59ec9df29c919d2026c0af1dd0d4799b9b3bd0a7129eb19c0"
+      },
+      {
+        "path": "results/scores_proposed_featnorm_MPPT_seed1.npz",
+        "sha256": "80f4aacc4e49dc59a77d3f5269608df2ebfabdebf6b784d10597d1c7aa582092"
+      },
+      {
+        "path": "results/scores_proposed_featnorm_MPPT_seed2.npz",
+        "sha256": "5897a98490d6acdb3bd0c6bdca791117e22e85e865d84e2d26637f9bc2341389"
+      },
+      {
+        "path": "results/scores_baseline_elliptic_envelope_IPPT.npz",
+        "sha256": "1387bcf4a3ce6119f2530c7da0b2f98e610068d20bf43f8521dae38fbf569bc0"
+      },
+      {
+        "path": "results/scores_baseline_elliptic_envelope_MPPT.npz",
+        "sha256": "91fca865da1fd6a8ad8ead0aacb42f5507dd577375d49a75d5b11482ca5fa7a2"
+      },
+      {
+        "path": "results/scores_baseline_isolation_forest_IPPT.npz",
+        "sha256": "f61ac51df171153fb3e7c5415d56d74151201085a9bf8a6314f3d5c0a14a3633"
+      },
+      {
+        "path": "results/scores_baseline_isolation_forest_MPPT.npz",
+        "sha256": "bf6411cd6ac558470d602ba46a2492fa720ddfb59a5721e1a2bba5af6c3d8b5f"
+      },
+      {
+        "path": "results/scores_baseline_lof_IPPT.npz",
+        "sha256": "439dca4b2aafb909851ccbd89b5a6bf9557a503d990318a16fedb2612204fd76"
+      },
+      {
+        "path": "results/scores_baseline_lof_MPPT.npz",
+        "sha256": "ed5ac4e66483cbd53205d8de649852bbefaa200279644f0eaaadea5d94a03282"
+      },
+      {
+        "path": "results/scores_baseline_one_class_svm_IPPT.npz",
+        "sha256": "ec8be2c1981ddd76fa1d692d579a78336d593a528d1da18d5cb6c3c1f59ed6df"
+      },
+      {
+        "path": "results/scores_baseline_one_class_svm_MPPT.npz",
+        "sha256": "ae70fd368310d935beae871ba899f1db23710ae380214c194c5baf4f423b5aa6"
+      },
+      {
+        "path": "results/scores_baseline_mahalanobis_window_mean_IPPT.npz",
+        "sha256": "c1f6386b0085257b328c14164d80d35cf646cd9a9d732fb8cecce078645861e9"
+      },
+      {
+        "path": "results/scores_baseline_mahalanobis_window_mean_MPPT.npz",
+        "sha256": "4812226647136ff36a2c4ef890f91cf4857fcd058a642c48738e05f616f88877"
+      }
+    ]
+  },
+  "primary": {
+    "label_view": "whole_file",
+    "negative": "healthy F0*_test windows",
+    "positive": "all windows of the fault file",
+    "threshold": "stored in the archive, 99th percentile of healthy validation scores",
+    "flag_rule": "score > threshold",
+    "bootstrap": {
+      "resamples": 200,
+      "equal_class_sizes": "n = number of healthy test windows drawn from each class",
+      "seed": 20261028,
+      "ci": "2.5th and 97.5th percentiles"
+    }
+  },
+  "secondary": {
+    "label_view": "within_run change test",
+    "pre": "same fault file, window end < 7.0 s and start >= 0.5 s",
+    "post": "same fault file, window start >= 8.0 s",
+    "bootstrap": {
+      "resamples": 200,
+      "equal_class_sizes": "n = min(number pre, number post)",
+      "seed": 20261028,
+      "ci": "2.5th and 97.5th percentiles"
+    }
+  },
+  "proposed_aggregation": {
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "per_fault_mean": "mean of the three per-seed bootstrap means",
+    "seed_std": "standard deviation of the three per-seed means (ddof=1)",
+    "interval": "percentiles of the seed-averaged bootstrap distribution"
+  },
+  "threshold_sensitivity": {
+    "quantiles": [
+      95.0,
+      97.5,
+      99.0,
+      99.5
+    ],
+    "source": "recomputed from saved healthy validation scores in each archive"
+  },
+  "zero_division": "precision=0 when no window is flagged; F1=0 when precision+recall=0",
+  "checks_passed": 21,
+  "checks_total": 21
+}

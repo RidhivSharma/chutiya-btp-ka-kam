@@ -169,3 +169,16 @@ At the end of every phase:
   failed, say exactly what failed.
 - In later phases, if a prompt tells you to write `results/summary.md`, add a
   new section to the existing file instead of replacing it.
+
+## 12. Final reporting rules (decided 2026-10-28, Phase 5)
+
+- In **all** tables the proposed model appears as **two variants**:
+  `Proposed (plain)` and `Proposed (featnorm)`.
+- Neither variant may be hidden, dropped, or tuned on the basis of fault
+  results. Both are always reported side by side.
+- The healthy-test false-alarm rate must be shown **next to every performance
+  table**, including per-fault, averaged, within-run, and threshold-sensitivity
+  tables. A table without that column is incomplete.
+- Primary whole-file results and secondary within-run results are reported as
+  separate views; a model is never ranked on fault performance alone without
+  its healthy-test false-alarm rate.

@@ -193,3 +193,20 @@ because of the gaps. No model or fault evaluation exists yet.
 - Seed consistency: largest threshold CV 8.13%; rise-class agreement 23/26; largest single-file seed ratio spread 4.29x.
 
 **Open issues/risks.** No GPU was available. Mean whole-file fault flag shares are 86.28%-100.00% (lowest single-seed share 82.69%), so the whole-file view is close to saturation; the pre/post-8 s comparison is the discriminating sanity view. `F3M` has no post-injection data. Windows overlap by 90%, and the healthy validation-to-test drift affects false-alarm transfer. No final metrics were computed.
+
+## 2026-10-28 - Phase 5: final evaluation
+
+**What was done.** Evaluated the frozen score archives only, with no retraining and no change to any score, threshold, k=3 or normalization. Computed the primary whole-file comparison for every model, mode and fault with 200 equal-class-size bootstrap resamples; the secondary pre-injection versus post-8 s within-run AUC; threshold sensitivity from saved healthy validation scores; and the reference-paper table with a different-protocol label. Both proposed variants (plain and featnorm) are reported side by side and F3M is marked as having no post-injection data.
+
+**Files created/changed.** `src/phase5_eval.py`, `src/phase5_summary.py`, `run_all.py`, `AGENTS.md` (two-variant and healthy-FAR reporting rule), `results/per_fault_primary_IPPT.csv`, `results/per_fault_primary_MPPT.csv`, `results/average_primary_IPPT.csv`, `results/average_primary_MPPT.csv`, `results/within_run_IPPT.csv`, `results/within_run_MPPT.csv`, `results/within_run_average_IPPT.csv`, `results/within_run_average_MPPT.csv`, `results/threshold_sensitivity.csv`, `results/paper_reference.csv`, `results/phase5_checks.json`, `results/phase5_metadata.json`, `results/summary.md`, `STATUS.md`.
+
+**Key numbers (computed by `src/phase5_eval.py`).**
+
+- 21/21 automated checks passed; 22 score archives read and none written.
+- Primary average F1: Proposed (plain) 0.9869 (IPPT, healthy-test FAR 0.00%) and 0.9891 (MPPT, FAR 2.17%); Proposed (featnorm) 0.9472 (IPPT, FAR 11.24%) and 0.8758 (MPPT, FAR 28.74%).
+- Within-run average AUC: Proposed (plain) 0.7507 IPPT and 0.7606 MPPT; Proposed (featnorm) 0.7676 IPPT and 0.7420 MPPT.
+- The two proposed variants do not beat the trivial Mahalanobis (window-mean) baseline in 19 listed variant/metric/mode places; every such place is listed in `results/summary.md`.
+- Primary average AUC is at least 0.99 for 6 of 7 models in IPPT and 5 of 7 models in MPPT.
+- `F3M` has 0 post-injection windows and is excluded from the within-run table; `F3L` has post-injection data and is included.
+
+**Open issues/risks.** The whole-file AUC is close to saturation for most models, while F1 and accuracy separate the models more; overlapping windows make the bootstrap intervals optimistic. Proposed (featnorm) has high healthy-test false-alarm rates. The reference-paper table uses a different protocol (single 10 kHz samples) and is reference only. F3M ends before 7 s. No model was retuned in response to any fault result.

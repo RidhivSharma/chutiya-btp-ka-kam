@@ -1,0 +1,120 @@
+{
+  "phase": "phase_5_final_evaluation",
+  "generated_utc": "2026-10-27T19:39:57.717778+00:00",
+  "checks_passed": 21,
+  "checks_total": 21,
+  "checks": [
+    {
+      "name": "archive_count",
+      "passed": true,
+      "detail": "22 archives: 10 baseline + 12 proposed"
+    },
+    {
+      "name": "archives_exist",
+      "passed": true,
+      "detail": "22/22 present"
+    },
+    {
+      "name": "archive_scores_finite",
+      "passed": true,
+      "detail": "22/22 archives all finite"
+    },
+    {
+      "name": "archive_part_names_complete",
+      "passed": true,
+      "detail": "22/22 archives contain exactly the expected 10 parts"
+    },
+    {
+      "name": "threshold_equals_healthy_validation_p99",
+      "passed": true,
+      "detail": "22 thresholds; max |stored - p99(F0_val)| = 0"
+    },
+    {
+      "name": "validation_precedes_test_without_overlap",
+      "passed": true,
+      "detail": "22/22 archives: max validation end < min test start"
+    },
+    {
+      "name": "primary_metrics_recomputed_from_archives",
+      "passed": true,
+      "detail": "4032 values recomputed; 0 mismatches"
+    },
+    {
+      "name": "within_run_metrics_recomputed_from_archives",
+      "passed": true,
+      "detail": "715 values recomputed; 0 mismatches"
+    },
+    {
+      "name": "average_primary_equals_mean_of_per_fault",
+      "passed": true,
+      "detail": "672 values recomputed; 0 mismatches"
+    },
+    {
+      "name": "within_run_average_equals_mean_of_per_fault",
+      "passed": true,
+      "detail": "98 values recomputed; 0 mismatches"
+    },
+    {
+      "name": "f3m_marked_no_post_injection_in_primary",
+      "passed": true,
+      "detail": "F3M appears for all 7 models with 0 post-injection windows and an explicit note"
+    },
+    {
+      "name": "f3m_excluded_from_within_run",
+      "passed": true,
+      "detail": "MPPT within-run faults: F1M,F2M,F4M,F5M,F6M,F7M"
+    },
+    {
+      "name": "within_run_has_both_classes",
+      "passed": true,
+      "detail": "every within-run row has n_pre > 0 and n_post > 0"
+    },
+    {
+      "name": "f3l_has_post_injection_data",
+      "passed": true,
+      "detail": "F3L is present in the IPPT within-run table (file ends after 8 s)"
+    },
+    {
+      "name": "threshold_sensitivity_recomputed_and_consistent_at_q99",
+      "passed": true,
+      "detail": "32 values checked; 0 problems"
+    },
+    {
+      "name": "both_proposed_variants_reported",
+      "passed": true,
+      "detail": "7 model labels: EllipticEnvelope, IsolationForest, LocalOutlierFactor, Mahalanobis (window-mean), OneClassSVM, Proposed (featnorm), Proposed (plain)"
+    },
+    {
+      "name": "healthy_test_false_alarm_rate_in_every_table",
+      "passed": true,
+      "detail": "present and non-missing in all Phase 5 performance tables"
+    },
+    {
+      "name": "bootstrap_equal_class_sizes_every_resample",
+      "passed": true,
+      "detail": "118800 resamples; 0 with unequal class sizes; per-class sizes seen: [225, 261, 267]..."
+    },
+    {
+      "name": "bootstrap_200_resamples_everywhere",
+      "passed": true,
+      "detail": "118800 draws at 200 resamples; 0 at other counts"
+    },
+    {
+      "name": "paper_reference_table_complete_and_labelled",
+      "passed": true,
+      "detail": "8 rows; every row carries the different-protocol note"
+    },
+    {
+      "name": "proposed_seed_detail_and_single_seed_baselines",
+      "passed": true,
+      "detail": "3 seed columns for both proposed variants; 1-seed baselines"
+    }
+  ],
+  "bootstrap": {
+    "resamples": 200,
+    "seed": 20261028,
+    "audit_draws": 118800,
+    "audit_unequal": 0,
+    "audit_resample_count_200": 118800
+  }
+}

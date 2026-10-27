@@ -1,0 +1,9 @@
+mode,model,paper_label,tpr,fpr,accuracy,precision,f1,auc,source,protocol_note
+MPPT,IsolationForest,iForest,0.7046,0.0073,0.8486,0.9890,0.8369,0.8486,reference paper published averages,"reference only, different protocol: the paper scores single 10 kHz samples; we score 100-sample windows at 1 kHz"
+MPPT,LocalOutlierFactor,LOF,0.9765,0.0676,0.9520,0.9624,0.9569,0.9423,reference paper published averages,"reference only, different protocol: the paper scores single 10 kHz samples; we score 100-sample windows at 1 kHz"
+MPPT,OneClassSVM,1SVM,0.4917,0.1156,0.7124,0.7148,0.6073,0.7124,reference paper published averages,"reference only, different protocol: the paper scores single 10 kHz samples; we score 100-sample windows at 1 kHz"
+MPPT,EllipticEnvelope,EE,0.8923,0.0000,0.9468,0.9998,0.9433,0.9468,reference paper published averages,"reference only, different protocol: the paper scores single 10 kHz samples; we score 100-sample windows at 1 kHz"
+IPPT,IsolationForest,iForest,0.7624,0.1137,0.8161,0.8999,0.8053,0.8161,reference paper published averages,"reference only, different protocol: the paper scores single 10 kHz samples; we score 100-sample windows at 1 kHz"
+IPPT,LocalOutlierFactor,LOF,0.9697,0.4625,0.8308,0.7315,0.8120,0.7536,reference paper published averages,"reference only, different protocol: the paper scores single 10 kHz samples; we score 100-sample windows at 1 kHz"
+IPPT,OneClassSVM,1SVM,0.5370,0.1471,0.6954,0.7809,0.6612,0.6954,reference paper published averages,"reference only, different protocol: the paper scores single 10 kHz samples; we score 100-sample windows at 1 kHz"
+IPPT,EllipticEnvelope,EE,0.8796,0.0683,0.9354,0.9759,0.9300,0.9354,reference paper published averages,"reference only, different protocol: the paper scores single 10 kHz samples; we score 100-sample windows at 1 kHz"

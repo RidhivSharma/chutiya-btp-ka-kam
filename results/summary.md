@@ -396,3 +396,152 @@ Problems or warnings:
 Decision needed from me: No. The architecture, fixed k=3, validation normalization, and threshold rule are frozen by this phase; Phase 5 can consume the saved archives without retuning anything after seeing fault sanity.
 
 Next phase: Phase 5 - final whole-file and time-resolved evaluation of the saved proposed-model score archives.
+
+## Phase 5: final evaluation   (2026-10-28 01:12 +0530)
+
+What was done: Phase 5 evaluated the frozen score archives for 7 models in both operating modes (IPPT and MPPT). The primary whole-file view labelled every window of a fault file as faulty and compared it with the healthy test windows of the same mode; the secondary within-run view compared pre-injection windows with post-8 s windows inside the same fault file. Every cell was bootstrapped 200 times with equal class sizes, and the two proposed variants were evaluated for seeds 0, 1, 2 and summarised across seeds. Threshold sensitivity was recomputed only from the saved healthy validation scores, and the reference paper's published averages were saved separately with a different-protocol warning. No model was retrained and no score, threshold, k=3 or normalization was changed.
+
+Files created or changed:
+- `src/phase5_eval.py` - reads the score archives and computes the primary, within-run and threshold-sensitivity tables plus the automated checks.
+- `src/phase5_summary.py` - reads the saved Phase 5 tables and writes this section plus the STATUS entry.
+- `results/per_fault_primary_IPPT.csv` - per-model, per-fault primary metrics and bootstrap intervals.
+- `results/per_fault_primary_MPPT.csv` - same for MPPT, including F3M marked as having no post-injection data.
+- `results/average_primary_IPPT.csv` - seven-fault and excluding-F3 averages.
+- `results/average_primary_MPPT.csv` - seven-fault and excluding-F3M averages.
+- `results/within_run_IPPT.csv` - within-run AUC and pre-injection flag shares per fault.
+- `results/within_run_MPPT.csv` - same for MPPT; F3M is absent because it has no post-injection windows.
+- `results/within_run_average_IPPT.csv`, `results/within_run_average_MPPT.csv` - fault-averaged within-run results.
+- `results/threshold_sensitivity.csv` - healthy-test false-alarm rate and average TPR at the 95, 97.5, 99 and 99.5 percentile thresholds.
+- `results/paper_reference.csv` - the reference paper's published averages, labelled reference only.
+- `results/phase5_checks.json` - all automated checks and their pass/fail detail.
+- `results/phase5_metadata.json` - bootstrap seeds, archive SHA-256 values, environment and method notes.
+- `results/summary.md` - this Phase 5 section.
+- `STATUS.md` - appended Phase 5 log entry.
+- `AGENTS.md` - added the rule that both proposed variants and the healthy-test false-alarm rate always appear in tables.
+- `run_all.py` - added the Phase 5 evaluation and summary steps.
+
+Key numbers:
+
+### 1. Primary whole-file averages (mean [95% bootstrap interval])
+
+Each value is the average over the 7 fault files of that mode. F3M is included for MPPT and is marked in the per-fault table as having no post-injection data. The healthy-test false-alarm rate is a point estimate at the stored 99th-percentile healthy-validation threshold; for the proposed variants it is averaged over seeds.
+
+**IPPT**
+
+| Model | F1 [95% CI] | Accuracy [95% CI] | AUC [95% CI] | TPR [95% CI] | FPR [95% CI] | Healthy-test FAR |
+|---|---|---|---|---|---|---|
+| Proposed (plain) | 0.9869 [0.9837, 0.9898] | 0.9878 [0.9850, 0.9904] | 0.9998 [0.9996, 0.9999] | 0.9755 [0.9700, 0.9807] | 0.0000 [0.0000, 0.0000] | 0.00% |
+| Proposed (featnorm) | 0.9472 [0.9426, 0.9519] | 0.9440 [0.9388, 0.9492] | 1.0000 [0.9999, 1.0000] | 1.0000 [1.0000, 1.0000] | 0.1120 [0.1017, 0.1223] | 11.24% |
+| EllipticEnvelope | 0.9798 [0.9755, 0.9835] | 0.9805 [0.9767, 0.9839] | 0.9989 [0.9982, 0.9994] | 0.9796 [0.9738, 0.9850] | 0.0186 [0.0128, 0.0235] | 1.87% |
+| IsolationForest | 0.9562 [0.9485, 0.9623] | 0.9603 [0.9540, 0.9655] | 0.9914 [0.9886, 0.9939] | 0.9207 [0.9080, 0.9310] | 0.0000 [0.0000, 0.0000] | 0.00% |
+| LocalOutlierFactor | 0.9381 [0.9314, 0.9442] | 0.9340 [0.9264, 0.9409] | 0.9955 [0.9941, 0.9971] | 0.9987 [0.9968, 1.0000] | 0.1307 [0.1172, 0.1455] | 13.11% |
+| OneClassSVM | 0.9134 [0.9051, 0.9221] | 0.9136 [0.9048, 0.9216] | 0.9795 [0.9758, 0.9828] | 0.9359 [0.9267, 0.9460] | 0.1088 [0.0952, 0.1225] | 10.86% |
+| Mahalanobis (window-mean) | 0.9962 [0.9939, 0.9981] | 0.9962 [0.9938, 0.9981] | 1.0000 [1.0000, 1.0000] | 1.0000 [1.0000, 1.0000] | 0.0077 [0.0037, 0.0123] | 0.75% |
+
+**MPPT**
+
+| Model | F1 [95% CI] | Accuracy [95% CI] | AUC [95% CI] | TPR [95% CI] | FPR [95% CI] | Healthy-test FAR |
+|---|---|---|---|---|---|---|
+| Proposed (plain) | 0.9891 [0.9857, 0.9922] | 0.9889 [0.9855, 0.9922] | 1.0000 [0.9999, 1.0000] | 0.9999 [0.9996, 1.0000] | 0.0221 [0.0157, 0.0288] | 2.17% |
+| Proposed (featnorm) | 0.8758 [0.8705, 0.8814] | 0.8559 [0.8487, 0.8633] | 1.0000 [1.0000, 1.0000] | 1.0000 [1.0000, 1.0000] | 0.2882 [0.2735, 0.3025] | 28.74% |
+| EllipticEnvelope | 0.9907 [0.9873, 0.9938] | 0.9906 [0.9871, 0.9937] | 1.0000 [1.0000, 1.0000] | 1.0000 [1.0000, 1.0000] | 0.0189 [0.0126, 0.0257] | 1.92% |
+| IsolationForest | 0.9439 [0.9329, 0.9524] | 0.9570 [0.9507, 0.9622] | 0.9816 [0.9770, 0.9852] | 0.9253 [0.9146, 0.9343] | 0.0113 [0.0077, 0.0159] | 1.15% |
+| LocalOutlierFactor | 0.9033 [0.8950, 0.9113] | 0.8930 [0.8829, 0.9028] | 0.9974 [0.9961, 0.9983] | 0.9977 [0.9956, 0.9995] | 0.2116 [0.1921, 0.2310] | 21.07% |
+| OneClassSVM | 0.8424 [0.8321, 0.8537] | 0.8300 [0.8191, 0.8426] | 0.9704 [0.9647, 0.9757] | 0.9439 [0.9338, 0.9524] | 0.2840 [0.2638, 0.3016] | 28.35% |
+| Mahalanobis (window-mean) | 0.9963 [0.9943, 0.9981] | 0.9963 [0.9943, 0.9981] | 1.0000 [1.0000, 1.0000] | 1.0000 [1.0000, 1.0000] | 0.0075 [0.0038, 0.0115] | 0.77% |
+
+**MPPT excluding F3M** (the reference paper omits F3 in its MPPT table)
+
+| Model | F1 [95% CI] | Accuracy [95% CI] | AUC [95% CI] | TPR [95% CI] | FPR [95% CI] | Healthy-test FAR |
+|---|---|---|---|---|---|---|
+| Proposed (plain) | 0.9891 [0.9853, 0.9923] | 0.9889 [0.9851, 0.9922] | 1.0000 [1.0000, 1.0000] | 1.0000 [1.0000, 1.0000] | 0.0221 [0.0155, 0.0298] | 2.17% |
+| Proposed (featnorm) | 0.8759 [0.8691, 0.8825] | 0.8560 [0.8470, 0.8645] | 1.0000 [1.0000, 1.0000] | 1.0000 [1.0000, 1.0000] | 0.2881 [0.2710, 0.3061] | 28.74% |
+| EllipticEnvelope | 0.9906 [0.9871, 0.9937] | 0.9905 [0.9869, 0.9936] | 1.0000 [1.0000, 1.0000] | 1.0000 [1.0000, 1.0000] | 0.0189 [0.0128, 0.0262] | 1.92% |
+| IsolationForest | 0.9944 [0.9921, 0.9965] | 0.9943 [0.9920, 0.9965] | 1.0000 [1.0000, 1.0000] | 1.0000 [1.0000, 1.0000] | 0.0113 [0.0070, 0.0160] | 1.15% |
+| LocalOutlierFactor | 0.9047 [0.8967, 0.9135] | 0.8945 [0.8847, 0.9052] | 1.0000 [1.0000, 1.0000] | 1.0000 [1.0000, 1.0000] | 0.2110 [0.1896, 0.2306] | 21.07% |
+| OneClassSVM | 0.8757 [0.8677, 0.8843] | 0.8580 [0.8474, 0.8691] | 1.0000 [1.0000, 1.0000] | 1.0000 [1.0000, 1.0000] | 0.2841 [0.2618, 0.3052] | 28.35% |
+| Mahalanobis (window-mean) | 0.9963 [0.9943, 0.9984] | 0.9962 [0.9943, 0.9984] | 1.0000 [1.0000, 1.0000] | 1.0000 [1.0000, 1.0000] | 0.0075 [0.0032, 0.0115] | 0.77% |
+
+### 2. Secondary within-run average AUC (same fault file)
+
+Pre-injection windows end before 7.0 s and start at or after 0.5 s; post-injection windows start at or after 8.0 s. F3M is excluded from MPPT because it ends before 7 s. A model that only recognises a different recording gives an AUC close to 0.5. The pre-injection columns show the share of pre-injection windows already flagged by the stored threshold; the final two columns repeat the healthy-test false-alarm rate next to the within-run result.
+
+| Model | IPPT within-run AUC [95% CI] | MPPT within-run AUC [95% CI] | IPPT pre-injection flagged | MPPT pre-injection flagged | IPPT healthy-test FAR | MPPT healthy-test FAR |
+|---|---|---|---|---|---|---|
+| Proposed (plain) | 0.7507 [0.7410, 0.7608] | 0.7606 [0.7519, 0.7687] | 95.80% | 100.00% | 0.00% | 2.17% |
+| Proposed (featnorm) | 0.7676 [0.7593, 0.7748] | 0.7420 [0.7374, 0.7482] | 100.00% | 100.00% | 11.24% | 28.74% |
+| EllipticEnvelope | 0.6862 [0.6762, 0.6954] | 0.8038 [0.7947, 0.8115] | 95.78% | 100.00% | 1.87% | 1.92% |
+| IsolationForest | 0.6504 [0.6410, 0.6596] | 0.7693 [0.7583, 0.7779] | 89.98% | 100.00% | 0.00% | 1.15% |
+| LocalOutlierFactor | 0.7467 [0.7358, 0.7580] | 0.7842 [0.7747, 0.7942] | 100.00% | 100.00% | 13.11% | 21.07% |
+| OneClassSVM | 0.7273 [0.7184, 0.7382] | 0.3156 [0.3081, 0.3235] | 92.23% | 100.00% | 10.86% | 28.35% |
+| Mahalanobis (window-mean) | 0.7194 [0.7086, 0.7308] | 0.7060 [0.6952, 0.7154] | 100.00% | 100.00% | 0.75% | 0.77% |
+
+### 3. Places where a proposed variant does not beat the trivial baseline
+
+The designated trivial baseline is Mahalanobis (window-mean), the Phase 2 placeholder. A place is listed when the proposed mean is lower (for F1, accuracy, AUC and TPR) or higher (for FPR, where lower is better) than the trivial baseline mean, or exactly tied. Both proposed variants are included; neither is dropped. Every line is generated from `average_primary_*.csv` and `within_run_average_*.csv`.
+
+- IPPT, primary F1: Proposed (plain) 0.986911 vs Mahalanobis (window-mean) 0.996184 - did not beat. Healthy-test false-alarm rate: 0.00% vs 0.75%.
+- IPPT, primary Accuracy: Proposed (plain) 0.987758 vs Mahalanobis (window-mean) 0.996162 - did not beat. Healthy-test false-alarm rate: 0.00% vs 0.75%.
+- IPPT, primary AUC: Proposed (plain) 0.999776 vs Mahalanobis (window-mean) 1.000000 - did not beat. Healthy-test false-alarm rate: 0.00% vs 0.75%.
+- IPPT, primary TPR: Proposed (plain) 0.975515 vs Mahalanobis (window-mean) 1.000000 - did not beat. Healthy-test false-alarm rate: 0.00% vs 0.75%.
+- IPPT, primary F1: Proposed (featnorm) 0.947245 vs Mahalanobis (window-mean) 0.996184 - did not beat. Healthy-test false-alarm rate: 11.24% vs 0.75%.
+- IPPT, primary Accuracy: Proposed (featnorm) 0.944016 vs Mahalanobis (window-mean) 0.996162 - did not beat. Healthy-test false-alarm rate: 11.24% vs 0.75%.
+- IPPT, primary AUC: Proposed (featnorm) 0.999965 vs Mahalanobis (window-mean) 1.000000 - did not beat. Healthy-test false-alarm rate: 11.24% vs 0.75%.
+- IPPT, primary TPR: Proposed (featnorm) 1.000000 vs Mahalanobis (window-mean) 1.000000 - tied. Healthy-test false-alarm rate: 11.24% vs 0.75%.
+- IPPT, primary FPR: Proposed (featnorm) 0.111968 vs Mahalanobis (window-mean) 0.007675 - did not beat (lower is better). Healthy-test false-alarm rate: 11.24% vs 0.75%.
+- MPPT, primary F1: Proposed (plain) 0.989063 vs Mahalanobis (window-mean) 0.996293 - did not beat. Healthy-test false-alarm rate: 2.17% vs 0.77%.
+- MPPT, primary Accuracy: Proposed (plain) 0.988921 vs Mahalanobis (window-mean) 0.996273 - did not beat. Healthy-test false-alarm rate: 2.17% vs 0.77%.
+- MPPT, primary AUC: Proposed (plain) 0.999976 vs Mahalanobis (window-mean) 1.000000 - did not beat. Healthy-test false-alarm rate: 2.17% vs 0.77%.
+- MPPT, primary TPR: Proposed (plain) 0.999928 vs Mahalanobis (window-mean) 1.000000 - did not beat. Healthy-test false-alarm rate: 2.17% vs 0.77%.
+- MPPT, primary FPR: Proposed (plain) 0.022085 vs Mahalanobis (window-mean) 0.007455 - did not beat (lower is better). Healthy-test false-alarm rate: 2.17% vs 0.77%.
+- MPPT, primary F1: Proposed (featnorm) 0.875837 vs Mahalanobis (window-mean) 0.996293 - did not beat. Healthy-test false-alarm rate: 28.74% vs 0.77%.
+- MPPT, primary Accuracy: Proposed (featnorm) 0.855882 vs Mahalanobis (window-mean) 0.996273 - did not beat. Healthy-test false-alarm rate: 28.74% vs 0.77%.
+- MPPT, primary AUC: Proposed (featnorm) 1.000000 vs Mahalanobis (window-mean) 1.000000 - tied. Healthy-test false-alarm rate: 28.74% vs 0.77%.
+- MPPT, primary TPR: Proposed (featnorm) 1.000000 vs Mahalanobis (window-mean) 1.000000 - tied. Healthy-test false-alarm rate: 28.74% vs 0.77%.
+- MPPT, primary FPR: Proposed (featnorm) 0.288236 vs Mahalanobis (window-mean) 0.007455 - did not beat (lower is better). Healthy-test false-alarm rate: 28.74% vs 0.77%.
+
+### 4. Is the primary view saturated?
+
+No, not uniformly - the primary whole-file view is only partly saturated: average AUC is at least 0.99 for 6 of 7 models in IPPT and 5 of 7 models in MPPT, and 89 of 98 model-by-fault AUC cells reach 0.99, but average F1 reaches 0.99 for only 1 of 7 models in IPPT and 2 of 7 models in MPPT, with 42 of 98 F1 cells at that level. AUC is therefore close to saturation, while F1, accuracy, precision and TPR are high but not uniformly near 100% (`average_primary_*.csv`, `per_fault_primary_*.csv`).
+
+### Threshold sensitivity
+
+The threshold-sensitivity file shows that moving the threshold away from the frozen 99th percentile changes the healthy-test false-alarm rate; no setting was selected from fault performance.
+
+Checks passed:
+- PASS `archive_count` - 22 archives: 10 baseline + 12 proposed.
+- PASS `archives_exist` - 22/22 present.
+- PASS `archive_scores_finite` - 22/22 archives all finite.
+- PASS `archive_part_names_complete` - 22/22 archives contain exactly the expected 10 parts.
+- PASS `threshold_equals_healthy_validation_p99` - 22 thresholds; max |stored - p99(F0_val)| = 0.
+- PASS `validation_precedes_test_without_overlap` - 22/22 archives: max validation end < min test start.
+- PASS `primary_metrics_recomputed_from_archives` - 4032 values recomputed; 0 mismatches.
+- PASS `within_run_metrics_recomputed_from_archives` - 715 values recomputed; 0 mismatches.
+- PASS `average_primary_equals_mean_of_per_fault` - 672 values recomputed; 0 mismatches.
+- PASS `within_run_average_equals_mean_of_per_fault` - 98 values recomputed; 0 mismatches.
+- PASS `f3m_marked_no_post_injection_in_primary` - F3M appears for all 7 models with 0 post-injection windows and an explicit note.
+- PASS `f3m_excluded_from_within_run` - MPPT within-run faults: F1M,F2M,F4M,F5M,F6M,F7M.
+- PASS `within_run_has_both_classes` - every within-run row has n_pre > 0 and n_post > 0.
+- PASS `f3l_has_post_injection_data` - F3L is present in the IPPT within-run table (file ends after 8 s).
+- PASS `threshold_sensitivity_recomputed_and_consistent_at_q99` - 32 values checked; 0 problems.
+- PASS `both_proposed_variants_reported` - 7 model labels: EllipticEnvelope, IsolationForest, LocalOutlierFactor, Mahalanobis (window-mean), OneClassSVM, Proposed (featnorm), Proposed (plain).
+- PASS `healthy_test_false_alarm_rate_in_every_table` - present and non-missing in all Phase 5 performance tables.
+- PASS `bootstrap_equal_class_sizes_every_resample` - 118800 resamples; 0 with unequal class sizes; per-class sizes seen: [225, 261, 267]....
+- PASS `bootstrap_200_resamples_everywhere` - 118800 draws at 200 resamples; 0 at other counts.
+- PASS `paper_reference_table_complete_and_labelled` - 8 rows; every row carries the different-protocol note.
+- PASS `proposed_seed_detail_and_single_seed_baselines` - 3 seed columns for both proposed variants; 1-seed baselines.
+- 21/21 automated Phase 5 checks passed.
+
+Problems or warnings:
+- The healthy-test false-alarm rates are not small for every model: Proposed (featnorm) is 11.24% in IPPT and 28.74% in MPPT, versus 0.00% and 2.17% for Proposed (plain). Fault metrics must be read together with these rates.
+- F3M ends at 6.988 s, before the 7.0-8.0 s injection interval. It is included in the primary MPPT average and is marked as having no post-injection data; it is excluded from the within-run analysis.
+- The within-run AUC is not close to 1 for any model: the lowest is IsolationForest at 0.6504 in IPPT and OneClassSVM at 0.3156 in MPPT, while the highest is Proposed (featnorm) at 0.7676 in IPPT and EllipticEnvelope at 0.8038 in MPPT. A value below 0.5 means the score is anti-correlated with the pre/post split.
+- Most models already flag most pre-injection windows at the stored threshold (fault-average share 89.98% to 100.00% across models and modes), so the binary flag is close to saturated before the fault is injected and the within-run AUC is the more informative secondary measure.
+- Threshold sensitivity: at the 95th-percentile threshold the healthy-test false-alarm rate ranges from 3.50% to 58.49% across the checked models (versus the frozen 99th-percentile rule). This is a reporting check only; no threshold was changed.
+- Windows overlap heavily within a recording. The bootstrap treats windows as independent, so its intervals are likely narrower than a block bootstrap that respected the overlap. The intervals describe window-level resampling, not independent physical events.
+- The reference paper scores single 10 kHz samples, while this pipeline scores 100-sample windows at 1 kHz. `results/paper_reference.csv` is reference only and is not a like-for-like comparison.
+- Average AUC is near 1.000 for most models, so small rank differences on the primary view should not be over-interpreted. The within-run view is not a healthy-versus-fault classifier metric.
+
+Decision needed from me: No. The two proposed variants, the 99th-percentile threshold, the 200-resample bootstrap and the equal-size class rule were fixed before the fault metrics were computed.
+
+Next phase: Phase 6 - manuscript figures and tables from the saved Phase 5 results (not started).

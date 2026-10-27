@@ -23,6 +23,8 @@ STEPS = [
     ("Phase 3 - summary report", PROJECT_ROOT / "src" / "phase3_summary.py"),
     ("Phase 4 - proposed TCN-BiLSTM training", PROJECT_ROOT / "src" / "train.py"),
     ("Phase 4 - summary report", PROJECT_ROOT / "src" / "phase4_summary.py"),
+    ("Phase 5 - final evaluation from score archives", PROJECT_ROOT / "src" / "phase5_eval.py"),
+    ("Phase 5 - summary report", PROJECT_ROOT / "src" / "phase5_summary.py"),
 ]
 
 
